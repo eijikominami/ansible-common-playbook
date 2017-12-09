@@ -1,0 +1,4 @@
+# /common_playbook/roles/php-mongodb/handlers
+
+- name: restart httpd
+  service: name=httpd state=restarted

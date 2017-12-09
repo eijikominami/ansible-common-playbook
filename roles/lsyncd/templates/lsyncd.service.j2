@@ -1,0 +1,13 @@
+[Unit]
+Description=Lsyncd Service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/lsyncd -nodaemon -pidfile {{ lsyncd.pid_dir }}/lsyncd.pid {{ lsyncd.conf }}
+ExecReload=/bin/kill -HUP $MAINPID
+PIDFile={{ lsyncd.pid_dir }}/lsyncd.pid
+User={{ lsyncd.exec_user }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target 

@@ -1,0 +1,4 @@
+# /common_playbook/roles/mariadb-for-zabbix/defaults
+
+mariadb:
+  srv_conf: /etc/my.cnf.d/server.cnf

@@ -1,0 +1,25 @@
+# /common_playbook/roles/php-mongodb/tasks
+
+- name: "install the latest version of pcre-devel, php-pear, php-devel, php-xml, php-posix, php-process, openssl-devel"
+  yum: name={{ item }} state=latest
+  with_items:
+    - pcre-devel
+    - php-pear
+    - php-devel
+    - php-xml
+    - php-posix
+    - php-process
+    - openssl-devel
+
+- name: "install MongoDB pecl package"
+  pear: name=pecl/mongodb state=present
+  
+- name: "add a block to {{ php.ini }} if it does not exist"
+  blockinfile:
+    dest: "{{ php.ini }}"
+    marker: "; {mark} ANSIBLE MANAGED BLOCK (MONGODB)"
+    backup: yes
+    block: |
+       extension=mongodb.so
+  notify:
+    - restart httpd

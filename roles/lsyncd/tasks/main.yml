@@ -1,0 +1,104 @@
+# /common_playbook/roles/lsyncd/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ lsyncd.exec_user }}
+# {{ sync.source_dir }}
+# {{ sync.dest_address }}
+# {{ sync.module_name }}
+#
+####################################
+
+- name: "install the latest version of cmake, lua, lua-devel, asciidoc, gcc, logrotate"
+  yum: name={{ item }} state=latest
+  with_items:
+    - cmake
+    - lua
+    - lua-devel
+    - asciidoc
+    - gcc
+    - logrotate
+
+- name: "delete the lsyncd source files"
+  file: path=/usr/local/src/lsyncd-master state=absent
+
+- name: "download the lsyncd source files"
+  get_url: dest=/tmp force=yes timeout={{  get_url_timeout  }} url="{{ lsyncd.source_url }}"
+
+- name: "unpacks the lsyncd source files"
+  unarchive: remote_src=yes src=/tmp/lsyncd-master.zip dest=/usr/local/src
+
+- name: "cmake the lsync programs"
+  command: cmake . chdir=/usr/local/src/lsyncd-master
+
+- name: "make the lsync programs"
+  make: chdir=/usr/local/src/lsyncd-master
+
+- name: "install the lsync programs"
+  make: chdir=/usr/local/src/lsyncd-master target=install
+
+- name: "create lsyncd config file if it does not exist"
+  file: path="{{ lsyncd.conf }}" state=touch owner={{ lsyncd.exec_user }} group={{ lsyncd.exec_user }} mode=0644
+
+- name: "add a block to {{ lsyncd.conf }} if it does not exist"
+  blockinfile:
+    dest: "{{ lsyncd.conf }}"
+    owner: "{{ lsyncd.exec_user }}"
+    group: "{{ lsyncd.exec_user }}"
+    backup: yes
+    marker: "-- {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+      settings{
+              logfile    = "/var/log/lsyncd.log",
+              statusFile = "/tmp/lsyncd.stat",
+              -- ステータスの更新頻度
+              statusInterval = 1,
+              -- 再接続を試みる
+              insist = 1,
+      }
+  notify:
+    - restart lsyncd
+
+- name: "add a block to {{ lsyncd.conf }} if it does not exist"
+  blockinfile:
+    dest: "{{ lsyncd.conf }}"
+    owner: "{{ lsyncd.exec_user }}"
+    group: "{{ lsyncd.exec_user }}"
+    backup: yes
+    marker: "-- {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+    block: |
+      sync{
+              -- 標準の同期モード
+              default.rsync,
+              -- 同期ディレイ
+              delay = 0,
+              source="{{sync.source_dir}}",
+              target="{{ lsyncd.exec_user }}@{{ item.address }}::{{ sync.module_name }}"
+      }
+  with_items: "{{ sync.dest_address }}"
+  notify:
+    - restart lsyncd
+
+- name: "put {{ lsyncd.systemd_file }}"
+  template: src=lsyncd.service.j2 dest="{{ lsyncd.systemd_file }}" owner=root group=root mode=0644
+  notify:
+    - reload systemd daemon
+    - restart lsyncd
+
+- name: "create lsyncd pid directory"
+  file: path="{{ lsyncd.pid_dir }}" state=directory owner=root group=root mode=0755
+
+- name: "create lsyncd log file"
+  file: path="{{ lsyncd.log_file }}" state=touch owner={{ lsyncd.exec_user }} group={{ lsyncd.exec_user }} mode=0644
+
+# パーミッション644を指定しないとエラーで実行されない
+- name: "add a {{ lsyncd.logrotate }} if it does not exist"
+  copy: src=lsyncd dest={{ lsyncd.logrotate }} owner=root group=root mode=0644
+
+- name: "start service lsyncd, if not running"
+  service: name=lsyncd state=started enabled=yes
+
+# 監視可能なファイル数の上限を設定
+- name: "set fs.inotify.max_user_watches to {{ lsyncd.inotify_max_user }} in /etc/sysctl.conf"
+  sysctl: name=fs.inotify.max_user_watches value={{ lsyncd.inotify_max_user }}

@@ -1,0 +1,7 @@
+# /common_playbook/roles/gitlab/handlers
+
+- name: restart httpd
+  service: name=httpd state=restarted
+
+- name: configure and start gitlab
+  command: "gitlab-ctl reconfigure"

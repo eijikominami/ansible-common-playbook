@@ -1,0 +1,4 @@
+# /common_playbook/roles/php-mongodb/defaults
+
+php:
+  ini: /etc/php.ini

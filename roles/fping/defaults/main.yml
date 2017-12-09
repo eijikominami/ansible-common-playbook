@@ -1,0 +1,6 @@
+# /common_playbook/roles/fping/defaults
+
+fping:
+  version: 3.16
+  source_url: http://fping.org/dist/fping-3.16.tar.gz
+  bin: /usr/local/sbin/fping

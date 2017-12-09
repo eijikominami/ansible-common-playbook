@@ -1,0 +1,11 @@
+uid = {{ sync.user }}
+gid = {{ sync.group }}
+log file = /var/log/rsyncd.log
+pid file = /var/run/rsyncd.pid
+hosts allow   = {{ sync.allow_hosts }}
+hosts deny    = *
+
+[{{ sync.module_name }}]
+comment = rsync server
+path = {{ sync.dest_path }}
+read only = false

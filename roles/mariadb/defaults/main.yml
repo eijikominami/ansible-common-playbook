@@ -1,0 +1,17 @@
+# /common_playbook/roles/mariadb/defaults
+
+mariadb:
+  table_open_cache: 400
+  query_cache_size: 0M
+  wait_timeout: 28800
+  interactive_timeout: 28800
+  thread_cache_size: 0
+  max_connections: 151
+  back_log: 50
+  open_files_limit: 0
+  key_buffer_size: 8388608
+  sort_buffer_size: 2097144
+  conf: /etc/my.cnf
+  srv_conf: /etc/my.cnf.d/server.cnf
+  sock: /var/lib/mysql/mysql.sock
+  ulimit_dir: /etc/systemd/system/mariadb.service.d

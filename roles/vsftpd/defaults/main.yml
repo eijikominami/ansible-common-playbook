@@ -1,0 +1,7 @@
+# /common_playbook/roles/vsftpd/defaults
+
+vsftpd:
+  conf: /etc/vsftpd/vsftpd.conf
+  userconf: /etc/vsftpd/userconf
+  chroot_list: /etc/vsftpd/chroot_list
+  user_list: /etc/vsftpd/user_list

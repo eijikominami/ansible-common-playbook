@@ -1,0 +1,23 @@
+# /common_playbook/roles/rundeck/tasks
+
+- name: "install the latest version of java-{{ jdk_ver }}-openjdk"
+  yum: name=java-{{ jdk_ver }}-openjdk state=latest
+
+- name: "add rundeck repository"
+  yum: name={{ rundeck.repo }} state=present
+
+- name: "install the latest version of rundeck"
+  yum: name=rundeck state=latest
+
+- name: "grails.serverURL of {{ rundeck.conf }}"
+  replace: dest="{{ rundeck.conf }}" regexp='grails.serverURL=.*$' replace="grails.serverURL=http://{{ ansible_default_ipv4.address }}:4440" backup=yes
+  notify:
+    - restart rundeckd
+  
+- name: "framework.server.url of {{ rundeck.framework_conf }}"
+  replace: dest="{{ rundeck.framework_conf }}" regexp='framework.server.url = .*$' replace="framework.server.url = http://{{ ansible_default_ipv4.address }}:4440" backup=yes
+  notify:
+    - restart rundeckd
+
+- name: "start service rundeckd, if not running"
+  service: name=rundeckd state=started enabled=yes

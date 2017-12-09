@@ -1,0 +1,7 @@
+# /common_playbook/roles/jenkins/handlers
+
+- name: restart jenkins
+  service: name=jenkins state=restarted
+
+- name: restart httpd
+  service: name=httpd state=restarted

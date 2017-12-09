@@ -1,0 +1,16 @@
+# /common_playbook/roles/zabbix/defaults
+
+zabbix:
+  version: 3.2.6
+  source_url: https://downloads.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/3.2.6/zabbix-3.2.6.tar.gz?r=http%3A%2F%2Fwww.zabbix.com%2Fdownload&use_mirror=master
+  conf: /usr/local/etc/zabbix_server.conf
+  log_dir: /var/log/zabbix
+  dir: /var/www/html/zabbix
+  user: zabbix
+  mariadb_name: zabbix
+  mariadb_user: zabbix
+  mariadb_pass: zabbix
+  start_snmptrapper: 1
+  start_pollers: 10
+  start_db_syncers: 4
+  cache_size: 32M

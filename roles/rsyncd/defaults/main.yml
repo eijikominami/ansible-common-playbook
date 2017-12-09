@@ -1,0 +1,5 @@
+# /common_playbook/roles/rsyncd/defaults
+
+rsyncd:
+  conf: /etc/rsyncd.conf
+  logrotate: /etc/logrotate.d/rsyncd

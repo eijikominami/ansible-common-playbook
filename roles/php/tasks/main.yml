@@ -1,0 +1,104 @@
+# /common_playbook/roles/php/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{php.configure_options}}
+# {{php.file_uploads_disabled}}
+# {{php.mysql_enabled}}
+# {{php.memory_limit}}
+# {{httpd.conf}}
+# {{httpd.compiled}}
+#
+# {{httpd.compiled}} が true のときは以下の値も指定すること
+# {{httpd.ctlbin}}
+#
+# {{php.mysql_enabled}} が true のときは以下の値も指定すること
+# {{mariadb.sock}}
+#
+####################################
+
+- name: "delete the PHP source files"
+  file: path=/usr/local/src/php-{{ php.version }} state=absent
+
+- name: "download the PHP source files"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ php.source_url }}"
+
+- name: "unpacks the PHP source files"
+  unarchive: remote_src=yes src=/tmp/php-{{ php.version }}.tar.gz dest=/usr/local/src
+
+- name: "configure the PHP programs"
+  command: "chdir=/usr/local/src/php-{{ php.version }} ./configure {{ php.configure_options }}"
+
+- name: "make the PHP programs"
+  make: chdir=/usr/local/src/php-{{ php.version }}
+
+- name: "install the PHP programs"
+  make: chdir=/usr/local/src/php-{{ php.version }} target=install
+
+# タイムゾーンと文字コードを指定  
+- name: "add a block to {{ php.ini }} if it does not exist"
+  blockinfile:
+    dest: "{{ php.ini }}"
+    marker: "; {mark} ANSIBLE MANAGED BLOCK"
+    backup: yes
+    block: |
+       ; メモリリーク回避
+       memory_limit = {{ php.memory_limit }}
+       date.timezone = Asia/Tokyo
+       default_charset = UTF-8
+       ; 実行ディレクトリ以外のphpが動かなくなる
+       ;open_basedir = 
+       extension_dir = /usr/lib64/php/modules
+
+# PHPバージョンを表示しない
+- name: "disable expose_php in {{ php.ini }}"
+  replace: dest="{{ php.ini }}" regexp='^expose_php = .*$' replace="expose_php = Off" backup=yes
+
+# ファイルアップロードを許可しない
+- name: "disable file_uploads in {{ php.ini }}"
+  replace: dest="{{ php.ini }}" regexp='^file_uploads = .*$' replace="file_uploads = Off" backup=yes
+  when: php.file_uploads_disabled
+
+# MySQL sock fileを指定
+- name: "edit location of mysql sock file in {{ php.ini }}" 
+  replace: dest="{{ php.ini }}" regexp='mysqli.default_socket =$' replace="mysqli.default_socket = {{ mariadb.sock }}" backup=yes
+  when: php.mysql_enabled
+
+- name: "add a block to {{ httpd.conf }} if it does not exist"
+  blockinfile:
+    dest: "{{ httpd.conf }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (PHP) "
+    backup: yes
+    block: |
+      <FilesMatch "\.php$">
+         AddHandler php7-script .php
+         AddType application/x-httpd-php .php
+      </FilesMatch>
+
+- name: "restart service apachectl"
+  command: "{{ httpd.ctlbin }} graceful"
+  when: httpd.compiled
+
+- name: "restart service httpd"
+  service: name=httpd state=restarted
+  when: not httpd.compiled
+
+- name: "show version number of PHP"
+  command: php -v
+  register: php_version
+  changed_when: false
+
+- name: "debug version number of PHP"
+  debug: var=php_version.stdout_lines
+  when: php_version | success
+
+- name: "show all loaded modules of PHP"
+  command: php -m
+  register: php_module
+  changed_when: false
+
+- name: "debug all loaded modules of PHP"
+  debug: var=php_module.stdout_lines
+  when: php_module | success
+

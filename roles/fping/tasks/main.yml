@@ -1,0 +1,37 @@
+# /common_playbook/roles/fping/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ zabbix.conf }}
+#
+####################################
+
+# Zabbixは導通チェックにfpingを使用
+- name: "download the fping source files"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ fping.source_url }}"
+
+- name: "unpacks the fping source files"
+  unarchive: remote_src=yes src=/tmp/fping-{{ fping.version }}.tar.gz dest=/usr/local/src
+
+- name: "configure the fping programs"
+  command: chdir=/usr/local/src/fping-{{ fping.version }} ./configure
+
+- name: "make the fping programs"
+  make: chdir=/usr/local/src/fping-{{ fping.version }}
+
+- name: "install the fping programs"
+  make: chdir=/usr/local/src/fping-{{ fping.version }} target=install
+
+# ソースコンパイル時は実行ファイルのパスが通常と異なる
+- name: "add fping location in {{ zabbix.conf }}"
+  lineinfile: 
+     dest: "{{ zabbix.conf }}"
+     line: "FpingLocation={{ fping.bin }}"
+     backup: yes
+
+# fpingをrootユーザ以外で実行すると以下のエラーが発生する
+# SUID（Set User ID）設定を行いrootユーザで実行する
+# [エラーメッセージ]　can't create socket (must run as root?))
+- name: "set user id to {{ fping.bin }}"
+  file: dest={{ fping.bin }} mode=4755

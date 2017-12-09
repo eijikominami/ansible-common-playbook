@@ -1,0 +1,82 @@
+# /common_playbook/roles/mariadb/tasks
+
+# mariadbの使用に必要なパッケージ
+- name: "install the latest version of mariadb, mariadb-server, php-mysql"
+  yum: name={{ item }} state=latest
+  with_items:
+    - mariadb
+    - mariadb-server
+    - php-mysql
+
+# SQLパラメータチューニング(ver5.5-デフォルト値)
+#
+# table_open_cache		: 開いたままにするファイル数(400)
+#                         Open_tables値を参照してチューニング
+# query_cache_size		: クエリ結果をキャッシュするために割り当てられたメモリーの量(0M)
+# wait_timeout			: 非インタラクティブな接続を閉じる前に、サーバーがその接続上でアクティビティーを待機する秒数(28800sec)
+# interactive_timeout	: 対話型の接続で、対話型の接続を閉じる前にアクティビティーを待機する秒数(28800sec)
+# thread_cache_size		: 再使用のためにキャッシュするスレッドの数(0)
+# max_connections		: 許可される最大のクライアントの同時接続数(151)
+# back_log				: 保持できる未処理の接続リクエストの数(50)
+# open_files_limit		: オペレーティングシステムでmysqld が開くことを許可するファイル数(0)
+#                         1) max_connections*5の値 2) table_cache*2+max_connections+10の値 3) 指定した値
+#                         設定値が適切ではないと"Out of resources when opening file"エラーが発生する
+# key_buffer_size		: インデックスブロックに使用されるバッファのサイズ(8388608)
+# sort_buffer_size		: ソートに使用されるバッファのサイズ(2097144)
+#
+# bind-address			: Listenポートを限定
+- name: "add a block to {{ mariadb.srv_conf }} if it does not exist"
+  blockinfile:
+    dest: "{{ mariadb.srv_conf }}"
+    backup: yes
+    insertafter: '\[mysqld\]'
+    block: |
+       character-set-server = utf8
+       collation-server     = utf8_bin
+       skip-character-set-client-handshake
+
+       table_open_cache = {{ mariadb.table_open_cache }}
+       query_cache_size = {{ mariadb.query_cache_size }}
+       wait_timeout = {{ mariadb.wait_timeout }}
+       interactive_timeout = {{ mariadb.interactive_timeout }}
+       thread_cache_size = {{ mariadb.thread_cache_size }}
+       max_connections = {{ mariadb.max_connections }}
+       back_log = {{ mariadb.back_log }}
+       open_files_limit = {{ mariadb.open_files_limit }}
+       
+       key_buffer_size = {{ mariadb.key_buffer_size }}
+       sort_buffer_size = {{ mariadb.sort_buffer_size }}
+       
+       # バイナリログを出力
+       log-bin=mysql-bin
+       # スレーブサーバのときマスターの更新もログに記録する
+       log_slave_updates
+  notify:
+    - restart mariadb
+
+- name: "create systemd config file directory"
+  file: dest="{{ mariadb.ulimit_dir }}" state=directory owner=root group=root mode=0755
+
+# mariadbのopen_files_limit値が適切ではないとToo many open filesエラーが発生する
+# mariadbのopen_files_limit値よりulimitで規定されているopen files値（通常は1024）が優先される
+#
+# override.confを用いてulimitによるopen files値の上書きを行う
+# LimitNOFILEには制限値を指定する方法と無限値（=infinity）を指定する方法とがある
+- name: "override ulimit value"
+  copy: src=override.conf dest="{{ mariadb.ulimit_dir }}/override.conf"
+  notify:
+    # systemdの設定を変更した場合はdaemon-reloadが必要
+    - reload mariadb daemon
+    - restart mariadb
+
+- name: "start service mariadb, if not running"
+  service: name=mariadb state=started enabled=yes
+
+- name: "show full status of mariadb"
+  command: "mysql -V"
+  register: mariadb_status
+  changed_when: false
+
+- name: "debug full status of mariadb"
+  debug: var=mariadb_status.stdout_lines
+  when: mariadb_status | success

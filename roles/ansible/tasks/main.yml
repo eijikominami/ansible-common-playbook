@@ -1,0 +1,34 @@
+# /common_playbook/roles/ansible/tasks
+
+- name: "add epel repository"
+  yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" enabled=no
+
+- name: "install the latest version of ansible"
+  yum: name=ansible state=latest enablerepo=epel
+
+# control_path = %(directory)s/%%h-%%r
+#   デフォルト設定の場合、SSH接続時のファイル名サイズ上限（108文字）を超えて以下のエラーが発生する
+#   ディレクトリ命名規則を変更してエラーの発生を防ぐ
+#   [エラーメッセージ] ControlPath too long
+#
+# ssh_args = -o UserKnownHostsFile=/dev/null
+#   未ログイン端末に初めてログインした場合、以下のようなfingerprintの整合性エラーが発生する
+#   fingerprintの保存ファイルを空指定してエラーの発生を防ぐ
+#   host_key_checking = Falseが効いていない場合がある
+#   [エラーメッセージ] Please add this host's fingerprint to your known_hosts file to manage this host
+#
+# hash_behaviour = merge
+#   vars_filesが複数あった場合は、後優先で置換（replace）されてしまう
+#   マージポリシーを統合（marge)に変更してそれぞれの値を取得できるようにする
+- name: "add a block to {{ ansible.config }} if it does not exist"
+  blockinfile:
+    dest: "{{ ansible.config }}"
+    backup: yes
+    block: |
+      [ssh_connection]
+      control_path = %(directory)s/%%h-%%r
+      ssh_args = -o UserKnownHostsFile=/dev/null
+      [defaults]
+      host_key_checking = False
+      log_path=/var/log/ansible.log
+      hash_behaviour = merge

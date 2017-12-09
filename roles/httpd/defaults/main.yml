@@ -1,0 +1,39 @@
+# /common_playbook/roles/httpd/defaults
+
+httpd:
+  version: 2.4.29
+  source_url: http://ftp.jaist.ac.jp/pub/apache/httpd/httpd-2.4.29.tar.gz
+  user: apache
+  base_dir: /usr/local/apache2
+  doc_root: /usr/local/apache2/htdocs
+  conf_dir: /usr/local/apache2/conf
+  conf: /usr/local/apache2/conf/httpd.conf
+  default_conf: /usr/local/apache2/conf/extra/httpd-default.conf
+  mpm_conf: /usr/local/apache2/conf/extra/httpd-mpm.conf
+  info_conf: /usr/local/apache2/conf/extra/httpd-info.conf
+  ssl_conf: /usr/local/apache2/conf/extra/httpd-ssl.conf
+  cgibin: /usr/local/apache2/cgi-bin
+  manual: /usr/local/apache2/manual
+  log: /var/apache/logs
+  logrotate: /etc/logrotate.d/httpd
+  htdigest: /usr/local/apache2/secure
+  ctlbin: /usr/local/apache2/bin/apachectl
+  daemon: /usr/local/apache2/bin/httpd
+  server_admin: webmaster@apache.org
+  ssl_enabled: false
+  pass: password
+  timeout: 60
+  max_keepalive_requests: 100
+  keepalive_timeout: 5
+  start_servers: 5
+  min_spare_servers: 5
+  max_spare_servers: 10
+  max_request_workers: 250
+  server_limit: 256
+  max_connections_per_child: 0
+apr:
+  version: 1.6.3
+  source_url: http://ftp.jaist.ac.jp/pub/apache//apr/apr-1.6.3.tar.gz
+apr_util:
+  version: 1.6.1
+  source_url: http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-1.6.1.tar.gz

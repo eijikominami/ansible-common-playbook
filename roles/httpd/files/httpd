@@ -1,0 +1,7 @@
+/var/apache/logs/*_log {
+    missingok
+    dateext
+    notifempty
+    sharedscripts
+    delaycompress
+}

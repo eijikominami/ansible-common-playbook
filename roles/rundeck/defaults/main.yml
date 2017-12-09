@@ -1,0 +1,6 @@
+# /common_playbook/roles/rundeck/defaults
+
+rundeck:
+  repo: http://repo.rundeck.org/latest.rpm
+  conf : /etc/rundeck/rundeck-config.properties
+  framework_conf : /etc/rundeck/framework.properties

@@ -1,0 +1,49 @@
+# /common_playbook/roles/openssl/tasks
+
+# コンパイルに必要なパッケージをインストール
+- name: "install the latest version of gcc, zlib-devel"
+  yum: name={{ item }} state=latest
+  with_items:
+    - gcc
+    - zlib-devel
+
+- name: "delete the openssl source files"
+  file: path=/usr/local/src/openssl-{{ ssl.version }} state=absent
+
+- name: "download the openssl source files"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ ssl.source_url }}"
+
+- name: "unpacks the openssl source files"
+  unarchive: remote_src=yes src=/tmp/openssl-{{ ssl.version }}.tar.gz dest=/usr/local/src
+
+# openssl configure options
+#
+# shared          	: In addition to the usual static libraries, create shared shared libraries" below.
+# zlib				: Build with support for zlib compression/decompression.
+
+- name: "configure the openssl programs"
+  command: chdir=/usr/local/src/openssl-{{ ssl.version }} ./config shared zlib
+
+- name: "make the openssl programs"
+  command: make chdir=/usr/local/src/openssl-{{ ssl.version }}
+
+- name: "install the openssl programs"
+  command: make install chdir=/usr/local/src/openssl-{{ ssl.version }}
+
+# 共通ライブラリにSSLライブラリのパスを追加する
+- name: "add ssl library location in {{ ssl.so_lib_dir }}"
+  lineinfile: dest={{ ssl.so_lib_dir }} line="{{ ssl.dir }}/lib" backup=yes
+
+# 共通ライブラリの再読み込みを行う
+- name: "configure dynamic linker run time bindings"
+  command: ldconfig
+
+- name: "show version of openssl"
+  command: "{{ ssl.dir }}/bin/openssl version"
+  register: openssl_version
+  changed_when: false
+
+- name: "debug version of openssl"
+  debug: var=openssl_version.stdout_lines
+  when: openssl_version | success
+  

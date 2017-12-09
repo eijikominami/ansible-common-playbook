@@ -1,0 +1,8 @@
+# /common_playbook/roles/httpd-for-zabbix/defaults
+
+php:
+  ini: /etc/php.ini
+  max_execution_time: 300
+  max_input_time: 300
+  post_max_size: 16M
+  timezone: Asia/Tokyo

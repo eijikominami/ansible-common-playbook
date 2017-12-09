@@ -1,0 +1,7 @@
+# /common_playbook/roles/lsyncd/handlers
+
+- name: reload systemd daemon
+  systemd: daemon-reload=yes
+
+- name: restart lsyncd
+  service: name=lsyncd state=restarted

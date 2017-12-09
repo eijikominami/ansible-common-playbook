@@ -1,0 +1,36 @@
+# /common_playbook/roles/mariadb-for-zabbix/tasks
+
+# mariadbの使用に必要なパッケージ
+# ansibleのmysql_dbを使用する際はMySQL-pythonパッケージが必要
+- name: "install the latest version of mariadb, mariadb-server, mariadb-devel, MySQL-python"
+  yum: name={{ item }} state=latest
+  with_items:
+    - mariadb
+    - mariadb-server
+    - mariadb-devel
+    - MySQL-python
+
+- name: "add a block to {{ mariadb.srv_conf }} if it does not exist"
+  blockinfile:
+    dest: "{{ mariadb.srv_conf }}"
+    backup: yes
+    insertafter: '\[mysqld\]'
+    block: |
+       character-set-server = utf8
+       collation-server     = utf8_bin
+       skip-character-set-client-handshake
+       innodb_file_per_table
+  notify:
+    - restart mariadb
+
+- name: "start service mariadb, if not running"
+  service: name=mariadb state=started enabled=yes
+
+- name: "show full status of mariadb"
+  command: "mysql -V"
+  register: mariadb_status
+  changed_when: false
+
+- name: "debug full status of mariadb"
+  debug: var=mariadb_status.stdout_lines
+  when: mariadb_status | succeeded

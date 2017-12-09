@@ -1,0 +1,7 @@
+# /zabbix/roles/snmptt/handlers
+
+- name: restart snmptt
+  service: name=snmptt state=restarted
+
+- name: restart snmptrapd
+  service: name=snmptrapd state=restarted

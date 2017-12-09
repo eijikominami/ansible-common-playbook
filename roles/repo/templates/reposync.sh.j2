@@ -1,0 +1,19 @@
+#!/bin/sh
+
+PROXY_URL="{{ proxy_ip }}"
+export http_proxy=http://$PROXY_URL
+export https_proxy=http://$PROXY_URL
+
+reposync -r base -n -p {{ centos_repo.dir }} -t /var/cache/yum
+createrepo {{ centos_repo.dir }}base/
+
+reposync -r updates -n -p {{ centos_repo.dir }} -t /var/cache/yum
+createrepo {{ centos_repo.dir }}updates/
+
+reposync -r extras -n -p {{ centos_repo.dir }} -t /var/cache/yum
+createrepo {{ centos_repo.dir }}extras/
+
+reposync -r centosplus -n -p {{ centos_repo.dir }} -t /var/cache/yum
+createrepo {{ centos_repo.dir }}centosplus/
+
+rsync -rptv --delete rsync://{{ centos_repo.mirror }}/{{ ansible_distribution_major_version }}/isos/{{ansible_architecture}}/ {{ centos_repo.dir }}isos/

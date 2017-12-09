@@ -1,0 +1,30 @@
+# /common_playbook/roles/repo/tasks
+
+- name: "add epel repository"
+  yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" enabled=no
+
+- name: "install the latest version of createrepo, yum-utils, httpd"
+  yum: name={{ item }} state=latest enablerepo=epel
+  with_items:
+    - createrepo
+    - yum-utils
+    - httpd
+
+- name: "start service httpd, if not running"
+  service: name=httpd state=started enabled=yes
+
+- name: "create centos repository directory"
+  file: path="{{ centos_repo.dir }}" state=directory owner=root group=root mode=0755
+
+- name: "create centos isos directory"
+  file: path="{{ centos_repo.dir }}/isos" state=directory owner=root group=root mode=0755
+
+# 自身が参照しているリポジトリ（CentOS7/x86_64/base,updates...）をコピー
+- name: "put {{ centos_repo.sync_sh }}"
+  template: src=reposync.sh.j2 dest="{{ centos_repo.sync_sh }}"
+
+- name: "add mode the {{ centos_repo.sync_sh }} file executable"
+  file: dest={{ centos_repo.sync_sh }} mode="ugo+x"
+
+- name: "add crontab to execute {{ centos_repo.sync_sh }}"
+  cron: name="syncrepo" minute="0" job="{{ centos_repo.sync_sh }}"

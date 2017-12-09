@@ -1,0 +1,6 @@
+# /common_playbook/roles/repo/defaults
+
+centos_repo:
+  mirror: ftp.riken.jp/Linux/centos
+  dir: /var/www/html/centos/
+  sync_sh: /usr/local/bin/reposync.sh

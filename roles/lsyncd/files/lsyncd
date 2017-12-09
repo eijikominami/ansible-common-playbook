@@ -1,0 +1,7 @@
+/var/log/lsyncd.log {
+    missingok
+    dateext
+    notifempty
+    sharedscripts
+    delaycompress
+}

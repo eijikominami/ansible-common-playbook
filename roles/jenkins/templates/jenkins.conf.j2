@@ -1,0 +1,10 @@
+# リバースプロキシ設定
+#
+# フォワードプロキシを禁止
+ProxyRequests off
+# nocanon : URLパスをエンコードせずにそのままアプリケーションサーバに渡す
+ProxyPass /jenkins http://localhost:{{  jenkins.port  }}/jenkins nocanon
+# アプリケーションサーバからの応答時にLocation, Content-Location, URI ヘッダを調整
+ProxyPassReverse /jenkins http://localhost:{{  jenkins.port  }}/jenkins
+# エンコード済みパス分離文字を許可
+AllowEncodedSlashes NoDecode

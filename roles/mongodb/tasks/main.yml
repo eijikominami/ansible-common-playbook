@@ -1,0 +1,17 @@
+# /common_playbook/roles/mongodb/tasks
+
+- name: "add mongodb repository"
+  yum_repository: name=mongodb description="mongodb repository" baseurl="{{ mongo.repo_url }}"
+
+# mongodb-org-mongosインストール時に証明書エラーが発生するためdisable_gpg_check=yesを指定
+- name: "install the latest version of mongodb-org, mongodb-org-server, mongodb-org-shell, mongodb-org-tools, mongodb-org-mongos"
+  yum: name={{ item }} state=latest disable_gpg_check=yes
+  with_items:
+    - mongodb-org
+    - mongodb-org-server
+    - mongodb-org-shell
+    - mongodb-org-tools
+    - mongodb-org-mongos
+
+- name: "start service mongod, if not running"
+  service: name=mongod state=started enabled=yes

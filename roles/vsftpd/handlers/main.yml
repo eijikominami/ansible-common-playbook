@@ -1,0 +1,4 @@
+# /common_playbook/roles/vsftpd/handlers
+
+- name: restart vsftpd
+  service: name=vsftpd state=restarted

@@ -1,0 +1,11 @@
+# /common_playbook/roles/lsyncd/defaults
+
+lsyncd:
+  exec_user: root
+  source_url: https://github.com/axkibe/lsyncd/archive/master.zip
+  conf: /etc/lsyncd.conf
+  systemd_file: /etc/systemd/system/lsyncd.service
+  pid_dir: /var/run/lsyncd
+  log_file: /var/log/lsyncd.log
+  logrotate: /etc/logrotate.d/lsyncd
+  inotify_max_user: 38400

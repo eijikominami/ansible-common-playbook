@@ -1,0 +1,120 @@
+# /common_playbook/roles/zabbix/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ zabbix.start_pollers }}
+# {{ zabbix.start_db_syncers }}
+# {{ zabbix.cache_size }}
+#
+####################################
+
+# Zabbixのインストールに必要なパッケージ
+- name: "install the latest version of libxml2-devel, net-snmp, net-snmp-devel, libcurl-devel"
+  yum: name={{ item }} state=latest
+  with_items:
+    - libxml2-devel
+    - net-snmp
+    - net-snmp-devel
+    - libcurl-devel
+
+- name: "show version of zabbix"
+  command: "/usr/local/sbin/zabbix_server -V"
+  register: zabbix_current_version
+  changed_when: false
+  ignore_errors: true
+
+- name: "debug version of zabbix"
+  debug: var=zabbix_current_version.stdout_lines
+  when: zabbix_current_version | success
+
+- name: "delete the Zabbix source files"
+  file: path=/usr/local/src/zabbix-{{ zabbix.version }} state=absent
+
+- name: "get current unixtime"
+  debug: var=ansible_date_time
+  when: ansible_date_time | succeeded
+
+# Raspberry Piはarmv7(armhfp)アーキテクチャ
+# パッケージはx86_64のみなのでソースからコンパイルする
+- name: "download the Zabbix source files"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} validate_certs=no url="{{ zabbix.source_url }}&ts={{ ansible_date_time.epoch }}"
+
+- name: "unpacks the Zabbix source files"
+  unarchive: remote_src=yes src=/tmp/zabbix-{{ zabbix.version }}.tar.gz dest=/usr/local/src
+
+- name: "configure the Zabbix programs"
+  command: chdir=/usr/local/src/zabbix-{{ zabbix.version }} ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
+
+- name: "install the Zabbix programs"
+  make: chdir=/usr/local/src/zabbix-{{zabbix.version }} target=install
+
+# OS起動時にZabbixユーザでZabbixを実行
+- name: "add zabbix_server in rc.local"
+  lineinfile: 
+     dest: /etc/rc.local
+     line: "su -l zabbix -c 'zabbix_server'"
+     backup: yes
+
+- name: "add zabbix_agentd in rc.local"
+  lineinfile: 
+     dest: /etc/rc.local
+     line: "su -l zabbix -c 'zabbix_agentd'"
+     backup: yes
+
+# MySQLにユーザを追加
+- name: "create database user with name '{{ zabbix.mariadb_user }}' and password '{{ zabbix.mariadb_pass }}' with all database privileges"
+  mysql_user: name="{{ zabbix.mariadb_user }}" password="{{ zabbix.mariadb_pass }}" priv='*.*:ALL'
+
+# 既存データがある状態でデータインポートするとエラーが発生するので一度削除する
+- block:
+    - name: "delete the existing database with name '{{ zabbix.mariadb_name }}'"
+      mysql_db: name="{{ zabbix.mariadb_name }}" state=absent
+    - name: "create a new database with name '{{zabbix.mariadb_name}}'"
+      mysql_db: name="{{ zabbix.mariadb_name }}" state=present
+    - name: "restore database schema"
+      mysql_db: name="{{ zabbix.mariadb_name }}" state=import target="/usr/local/src/zabbix-{{ zabbix.version }}/database/mysql/schema.sql"
+    - name: "restore database images"
+      mysql_db: name="{{ zabbix.mariadb_name }}" state=import target="/usr/local/src/zabbix-{{ zabbix.version }}/database/mysql/images.sql"
+    - name: "restore database data"
+      mysql_db: name="{{ zabbix.mariadb_name }}" state=import target="/usr/local/src/zabbix-{{ zabbix.version }}/database/mysql/data.sql"
+  when: (zabbix_current_version | failed) or (zabbix.version not in zabbix_current_version.stdout_lines[0])
+
+# Zabbixユーザを作成
+- name: "add the user '{{ zabbix.user }}'"
+  user: name="{{ zabbix.user }}"
+
+# ディレクトリ作成
+- name: "create zabbix file directory"
+  file: dest="{{ zabbix.dir }}" state=directory owner=zabbix group=zabbix mode=0755
+
+# ワイルドカード(*)使用時はshellコマンドを使用
+# ansibleのcopyコマンドは再帰的なディレクトリコピーに非対応
+# rootユーザで実行するcpコマンドは"cp -i"のエイリアス
+# そのまま実行すると確認表示が出てしまうためフルパス(/bin/cp)で実行
+- name: "copy zabbix php file"
+  shell: "/bin/cp -R /usr/local/src/zabbix-{{ zabbix.version }}/frontends/php/* {{ zabbix.dir }}"
+
+- name: "change owner of zabbix contents directory"
+  file: dest="{{ zabbix.dir }}" state=directory owner=zabbix group=zabbix recurse=yes
+
+# [1] ZabbixにMySQLパスワードを設定
+#
+# [2] ZabbixのCacheSizeを変更
+#     データ容量が増えると以下のエラーが発生
+#     zbx_mem_realloc(): please increase CacheSize configuration parameter
+- name: "add a block to {{ zabbix.conf }} if it does not exist"
+  blockinfile:
+    dest: "{{ zabbix.conf }}"
+    backup: yes
+    block: |
+      DBPassword={{ zabbix.mariadb_pass }}
+      StartPollers={{ zabbix.start_pollers }}
+      StartDBSyncers={{ zabbix.start_db_syncers }}
+      CacheSize={{ zabbix.cache_size }}
+
+- name: "create log file directory"
+  file: dest="{{ zabbix.log_dir }}" state=directory owner=zabbix group=zabbix mode=0755
+
+- name: "edit LogFile location in {{ zabbix.conf }}"
+  replace: dest="{{ zabbix.conf }}" regexp='^LogFile=.*$' replace="LogFile={{ zabbix.log_dir }}/zabbix_server.log" backup=yes

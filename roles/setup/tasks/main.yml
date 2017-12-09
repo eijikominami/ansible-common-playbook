@@ -1,0 +1,52 @@
+# /common_playbook/roles/setup/tasks
+
+# - name: "upgrade all packages"
+#   yum: name=* state=latest
+
+# CentOS7では初期状態では実行権限が付与されていない
+- name: "add mode the /etc/rc.d/rc.local file executable"
+  file: dest=/etc/rc.d/rc.local mode="u+x"
+
+# @Development toolsはstate=presentを指定
+- name: "install the latest version of @Development tools"
+  yum: name="@Development tools" state=present
+
+- name: "install the latest version of wget, ntpdate, libselinux-python, git"
+  yum: name={{ item }} state=latest
+  with_items:
+    - wget
+    - ntpdate
+    - libselinux-python
+    - git
+
+- name: "stop service iptables"
+  service: name={{ item }} enabled=no state=stopped
+  with_items:
+    - iptables
+    - ip6tables
+  when: ansible_distribution_major_version == "6"
+
+- name: "stop service firewalld"
+  service: name=firewalld enabled=no state=stopped
+  when: ansible_distribution_major_version == "7"
+
+- name: "retrieve selinux config"
+  stat: path=/etc/selinux/config
+  register: selinux_conf
+
+# historyコマンドに時刻情報を付加する
+- name: "add a block to /etc/bashrc if it does not exist"
+  blockinfile:
+    dest: /etc/bashrc
+    backup: yes
+    block: |
+      HISTSIZE=50000
+      HISTTIMEFORMAT='%F %T '
+
+# libselinux-pythonパッケージのインストールが必要
+- name: "disable SELinux"
+  selinux: state=disabled
+  when: selinux_conf.stat.exists
+
+- name: "set timezone to Asia/Tokyo"
+  timezone: name=Asia/Tokyo

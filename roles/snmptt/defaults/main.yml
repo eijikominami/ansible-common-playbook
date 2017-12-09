@@ -1,0 +1,8 @@
+# /common_playbook/roles/snmptt/defaults
+
+snmptrapd:
+  conf: /etc/snmp/snmptrapd.conf
+  script: /etc/sysconfig/snmptrapd
+snmptt:
+  ini: /etc/snmp/snmptt.ini
+  conf: /etc/snmp/snmptt.conf

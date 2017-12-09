@@ -1,0 +1,21 @@
+# /common_playbook/roles/vsftpd/tasks
+
+- name: "install the latest version of vsftpd, ftp"
+  yum: name={{ item }} state=latest
+  with_items:
+    - vsftpd
+    - ftp
+
+- name: "put {{ vsftpd.conf }}"
+  template: src=vsftpd.conf.j2 dest="{{ vsftpd.conf }}" owner=root group=root mode=0600
+  notify:
+    - restart vsftpd
+
+- name: "create userconf directory"
+  file: path="{{ vsftpd.userconf }}" state=directory owner=root group=root mode=0755
+
+- name: "create chroot_list file"
+  file: path="{{ vsftpd.chroot_list }}" state=touch owner=root group=root mode=0644
+
+- name: "start service vsftpd, if not running"
+  service: name=vsftpd state=started enabled=yes

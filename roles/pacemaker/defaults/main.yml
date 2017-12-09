@@ -1,0 +1,9 @@
+# /common_playbook/roles/pacemaker/defaults
+
+pacemaker:
+  hacluster_password: hacluster
+  primary_ip: 192.168.1.101
+  primary_host: cluster01
+  secondary_ip: 192.168.1.102
+  secondary_host: cluster02
+  domain: example.com

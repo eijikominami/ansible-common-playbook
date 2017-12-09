@@ -1,0 +1,4 @@
+# /common_playbook/roles/mysql-for-zabbix/defaults
+
+mysqld:
+  conf: /etc/my.cnf

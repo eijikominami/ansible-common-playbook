@@ -1,0 +1,4 @@
+# /zabbix/roles/mysql-for-zabbix/handlers
+
+- name: restart mysqld
+  service: name=mysqld state=restarted

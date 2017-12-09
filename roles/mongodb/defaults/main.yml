@@ -1,0 +1,4 @@
+# /common_playbook/roles/mongodb/defaults
+
+mongo:
+  repo_url: http://downloads-distro.mongodb.org/repo/redhat/os/{{ansible_architecture}}

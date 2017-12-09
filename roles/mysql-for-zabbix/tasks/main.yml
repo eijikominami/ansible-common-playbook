@@ -1,0 +1,35 @@
+# /common_playbook/roles/mysql-for-zabbix/tasks
+
+# mysqlの使用に必要なパッケージ
+- name: "install the latest version of mysql, mysql-server, mysql-devel, MySQL-python27"
+  yum: name={{ item }} state=latest
+  with_items:
+    - mysql
+    - mysql-server
+    - mysql-devel
+    - MySQL-python27
+
+- name: "add a block to {{ mysqld.conf }} if it does not exist"
+  blockinfile:
+    dest: "{{mysqld_conf}}"
+    backup: yes
+    insertafter: '\[mysqld\]'
+    block: |
+       character-set-server = utf8
+       collation-server     = utf8_bin
+       skip-character-set-client-handshake
+       innodb_file_per_table
+  notify:
+    - restart mysqld
+
+- name: "start service mysqld, if not running"
+  service: name=mysqld state=started enabled=yes
+
+- name: "show full status of mysqld"
+  command: "mysql -V"
+  register: mysql_status
+  changed_when: false
+
+- name: "debug full status of mysqld"
+  debug: var=mysql_status.stdout_lines
+  when: mysql_status | succeeded

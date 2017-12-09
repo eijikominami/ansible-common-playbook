@@ -1,0 +1,4 @@
+# /common_playbook/roles/ansible/defaults
+
+ansible:
+  config: /etc/ansible/ansible.cfg

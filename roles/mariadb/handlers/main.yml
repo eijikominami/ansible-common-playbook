@@ -1,0 +1,8 @@
+# /common_playbook/roles/mariadb/handlers
+
+# systemdの設定を変更した場合はdaemon-reloadが必要
+- name: reload mariadb daemon
+  systemd: daemon-reload=yes
+
+- name: restart mariadb
+  service: name=mariadb state=restarted

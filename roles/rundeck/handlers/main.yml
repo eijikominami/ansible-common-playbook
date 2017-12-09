@@ -1,0 +1,4 @@
+# /common_playbook/roles/rundeck/handlers
+
+- name: restart rundeckd
+  service: name=rundeckd state=restarted

@@ -1,0 +1,7 @@
+/var/log/rsyncd.log {
+    missingok
+    dateext
+    notifempty
+    sharedscripts
+    delaycompress
+}

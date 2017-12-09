@@ -1,0 +1,9 @@
+# /common_playbook/roles/jenkins/defaults
+
+jenkins:
+  sudoers: /etc/sudoers.d/jenkins
+  url: http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+  repokey: https://jenkins-ci.org/redhat/jenkins-ci.org.key
+  conf: /etc/sysconfig/jenkins
+  httpd_conf: /etc/httpd/conf.d/jenkins.conf
+  port: 8080
