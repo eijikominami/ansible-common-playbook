@@ -5,6 +5,8 @@ gitlab:
   script: script.rpm.sh
   conf: /etc/gitlab/gitlab.rb
   erb: /opt/gitlab/embedded/cookbooks/gitlab/templates/default/gitlab.yml.erb
-  httpd_conf: /etc/httpd/conf.d/gitlab.conf
   unicorn_port: 8888
   nginx_port: 10080
+httpd:
+  compile_from_src: false
+  gitlab_conf: /etc/httpd/conf.d/gitlab.conf

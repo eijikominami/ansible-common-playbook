@@ -42,10 +42,19 @@
 - name: "edit nginx listen port in {{ gitlab.erb }}"
   replace: dest="{{ gitlab.erb }}" regexp='.*unicorn\[\'port\'\].*$' replace="unicorn['port'] = {{ gitlab.unicorn_port }}" backup=yes
 
-- name: "put {{ gitlab.httpd_conf }}"
-  template: src=gitlab.conf.j2 dest="{{ gitlab.httpd_conf }}"
+- name: "put {{ httpd.gitlab_conf }}"
+  template: src=gitlab.conf.j2 dest="{{ httpd.gitlab_conf }}"
   notify:
     - restart httpd
+    - restart apachectl daemon
 
-- name: "start service httpd, if not running"
-  service: name=httpd state=started enabled=yes
+- name: "add a block to {{ httpd.conf }} if it does not exist"
+  blockinfile:
+    dest: "{{ httpd.conf }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (GITLAB)"
+    backup: yes
+    block: |
+       Include {{ httpd.gitlab_conf }}
+  notify:
+    - restart apachectl daemon
+  when: httpd.compile_from_src
