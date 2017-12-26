@@ -76,6 +76,9 @@
          AddType application/x-httpd-php .php
       </FilesMatch>
 
+- name: "edit DirectoryIndex of {{ httpd.conf }}"
+  replace: dest="{{ httpd.conf }}" regexp='DirectoryIndex index.html.*$' replace="DirectoryIndex index.html index.php" backup=yes
+
 - name: "restart service apachectl"
   command: "{{ httpd.ctlbin }} graceful"
   when: httpd.compiled
