@@ -2,3 +2,5 @@
 
 php:
   ini: /etc/php.ini
+httpd:
+  compile_from_src: false

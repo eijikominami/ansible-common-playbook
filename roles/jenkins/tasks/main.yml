@@ -1,5 +1,13 @@
 # /common_playbook/roles/jenkins/tasks
 
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ httpd.compile_from_src }}
+# {{ httpd.jenkins_conf }}
+#
+####################################
+
 - name: "install the latest version of java-{{ jdk_ver }}-openjdk, httpd"
   yum: name={{ item }} state=latest
   with_items:
@@ -17,15 +25,27 @@
   notify:
     - restart jenkins
 
-- name: "edit JENKINS_ARGS in {{  jenkins.conf  }}"
-  replace: dest="{{  jenkins.conf  }}" regexp='.*JENKINS_ARGS.*=.*$' replace="JENKINS_ARGS="--prefix=/jenkins"" backup=yes
+- name: "edit JENKINS_ARGS in {{ jenkins.conf }}"
+  replace: dest="{{ jenkins.conf }}" regexp='.*JENKINS_ARGS.*=.*$' replace="JENKINS_ARGS="--prefix=/jenkins"" backup=yes
   notify:
     - restart jenkins
 
-- name: "put {{  jenkins.httpd_conf  }}"
-  template: src=jenkins.conf.j2 dest="{{  jenkins.httpd_conf  }}"
+- name: "put {{ httpd.jenkins_conf }}"
+  template: src=jenkins.conf.j2 dest="{{ httpd.jenkins_conf }}"
   notify:
     - restart httpd
+    - restart apachectl daemon
+
+- name: "add a block to {{ httpd.conf }} if it does not exist"
+  blockinfile:
+    dest: "{{ httpd.conf }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (JENKINS)"
+    backup: yes
+    block: |
+       Include {{ httpd.jenkins_conf }}
+  notify:
+    - restart apachectl daemon
+  when: httpd.compile_from_src
 
 # sudoの実行を可能にする
 - name: "add a sudoers file if it does not exist"

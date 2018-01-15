@@ -6,6 +6,7 @@ gitlab:
   conf: /etc/gitlab/gitlab.rb
   erb: /opt/gitlab/embedded/cookbooks/gitlab/templates/default/gitlab.yml.erb
   unicorn_port: 8888
+  unicorn_worker_timeout: 180
   nginx_port: 10080
 httpd:
   compile_from_src: false

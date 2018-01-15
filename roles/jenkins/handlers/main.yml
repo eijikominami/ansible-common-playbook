@@ -5,3 +5,8 @@
 
 - name: restart httpd
   service: name=httpd state=restarted
+  when: not httpd.compile_from_src
+
+- name: restart apachectl daemon
+  command: "{{httpd.ctlbin}} graceful"
+  when: httpd.compile_from_src

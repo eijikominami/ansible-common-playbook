@@ -1,5 +1,13 @@
 # /common_playbook/roles/gitlab/tasks
 
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ httpd.compile_from_src }}
+# {{ httpd.gitlab_conf }}
+#
+####################################
+
 - name: "install the latest version of curl, policycoreutils, openssh-server, openssh-clients"
   yum: name={{ item }} state=latest
   with_items:
@@ -36,6 +44,11 @@
 
 - name: "edit nginx listen port in {{ gitlab.conf }}"
   replace: dest="{{ gitlab.conf }}" regexp='.*unicorn\[\'port\'\].*$' replace="unicorn['port'] = {{ gitlab.unicorn_port }}" backup=yes
+  notify:
+    - configure and start gitlab
+
+- name: "edit uncorn worker timeiout in {{ gitlab.conf }}"
+  replace: dest="{{ gitlab.conf }}" regexp='.*unicorn\[\'worker_timeout\'\].*$' replace="unicorn['worker_timeout'] = {{ gitlab.unicorn_worker_timeout }}" backup=yes
   notify:
     - configure and start gitlab
 
