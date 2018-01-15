@@ -1,5 +1,12 @@
 # /common_playbook/roles/php-mongodb/tasks
 
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ httpd.compile_from_src }}
+#
+####################################
+
 - name: "install the latest version of pcre-devel, php-pear, php-devel, php-xml, php-posix, php-process, openssl-devel"
   yum: name={{ item }} state=latest
   with_items:
