@@ -5,7 +5,7 @@
   when: not httpd.compile_from_src
 
 - name: restart apachectl daemon
-  command: "{{httpd.ctlbin}} graceful"
+  command: "{{ httpd.ctlbin }} graceful"
   when: httpd.compile_from_src
 
 - name: configure and start gitlab

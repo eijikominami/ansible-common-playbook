@@ -1,6 +1,9 @@
 # /common_playbook/roles/php-mongodb/defaults
 
+php_mongo:
+  repo: https://github.com/mongodb/mongo-php-driver.git
 php:
   ini: /etc/php.ini
 httpd:
   compile_from_src: false
+  ctlbin: /usr/local/apache2/bin/apachectl

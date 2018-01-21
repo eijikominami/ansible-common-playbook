@@ -7,20 +7,24 @@
 #
 ####################################
 
-- name: "install the latest version of pcre-devel, php-pear, php-devel, php-xml, php-posix, php-process, openssl-devel"
-  yum: name={{ item }} state=latest
-  with_items:
-    - pcre-devel
-    - php-pear
-    - php-devel
-    - php-xml
-    - php-posix
-    - php-process
-    - openssl-devel
+- name: "delete the mongodb library source files"
+  file: path=/tmp/mongo-php-driver state=absent
 
-- name: "install MongoDB pecl package"
-  pear: name=pecl/mongodb state=present
-  
+- name: "git checkout the mongodb library source files"
+  git: dest=/tmp/mongo-php-driver repo="{{ php_mongo.repo }}"
+
+- name: "phpize the mongodb library"
+  command: "chdir=/tmp/mongo-php-driver phpize"
+
+- name: "configure the mongodb library"
+  command: chdir=/tmp/mongo-php-driver ./configure
+
+- name: "make the mongodb library"
+  make: chdir=/tmp/mongo-php-driver
+
+- name: "install the mongodb library"
+  make: chdir=/tmp/mongo-php-driver target=install
+
 - name: "add a block to {{ php.ini }} if it does not exist"
   blockinfile:
     dest: "{{ php.ini }}"

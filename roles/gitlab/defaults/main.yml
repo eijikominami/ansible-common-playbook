@@ -10,4 +10,5 @@ gitlab:
   nginx_port: 10080
 httpd:
   compile_from_src: false
+  ctlbin: /usr/local/apache2/bin/apachectl
   gitlab_conf: /etc/httpd/conf.d/gitlab.conf
