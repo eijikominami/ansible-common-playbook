@@ -15,13 +15,16 @@
     - httpd
 
 - name: "download the jenkins repo file"
-  get_url: dest=/etc/yum.repos.d/ force=yes timeout={{  get_url_timeout  }} url="{{  jenkins.url  }}"
+  get_url: dest=/etc/yum.repos.d/ force=yes timeout={{  get_url_timeout  }} url="{{  jenkins.repourl  }}"
+
+- name: "set jenkins repository disabled"
+  yum_repository: name={{ jenkins.reponame }} enabled=no
 
 - name: "import a rpm key from a url"
   rpm_key: state=present key="{{  jenkins.repokey  }}"
 
 - name: "install the latest version of jenkins"
-  yum: name=jenkins state=latest
+  yum: name=jenkins state=latest enablerepo={{ jenkins.reponame }}
   notify:
     - restart jenkins
 

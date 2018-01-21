@@ -25,9 +25,15 @@
 - name: "execute gitlab installation script"
   command: "sh /tmp/{{ gitlab.script }}"
 
+- name: "set gitlab repository disabled"
+  yum_repository: name={{ item }} enabled=no
+  with_items:
+    - gitlab_gitlab-ce
+    - gitlab_gitlab-ce-source
+
 # GitLab Community Editionのインストール
 - name: "install the latest version of gitlab-ce"
-  yum: name=gitlab-ce state=latest
+  yum: name=gitlab-ce state=latest enablerepo=gitlab_gitlab-ce
   notify:
     - configure and start gitlab
 

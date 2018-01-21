@@ -1,6 +1,7 @@
 # /common_playbook/roles/rundeck/defaults
 
 rundeck:
-  repo: http://repo.rundeck.org/latest.rpm
+  reporpm: http://repo.rundeck.org/latest.rpm
+  reponame: rundeck-release-bintray
   conf : /etc/rundeck/rundeck-config.properties
   framework_conf : /etc/rundeck/framework.properties

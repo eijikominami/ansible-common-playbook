@@ -2,7 +2,8 @@
 
 jenkins:
   sudoers: /etc/sudoers.d/jenkins
-  url: http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+  repourl: http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+  reponame: jenkins
   repokey: https://jenkins-ci.org/redhat/jenkins-ci.org.key
   conf: /etc/sysconfig/jenkins
   port: 8080
