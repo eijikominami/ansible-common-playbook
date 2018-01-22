@@ -5,6 +5,7 @@ php:
   source_url: https://php.net/distributions/php-7.2.0.tar.gz
   ini: /etc/php.ini
   configure_options: --enable-mbstring --with-apxs2=/usr/bin/apxs --with-config-file-path=/etc --disable-libxml --disable-xmlwriter --disable-xmlreader --disable-simplexml --disable-xml --disable-dom --without-pear
+  extensiondir: /usr/lib64/php/modules
   file_uploads_disabled: false
   mysql_enabled: false
   memory_limit: 16M

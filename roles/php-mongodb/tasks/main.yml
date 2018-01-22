@@ -8,22 +8,25 @@
 ####################################
 
 - name: "delete the mongodb library source files"
-  file: path=/tmp/mongo-php-driver state=absent
+  file: path="{{ php_mongo.basedir }}" state=absent
 
 - name: "git checkout the mongodb library source files"
-  git: dest=/tmp/mongo-php-driver repo="{{ php_mongo.repo }}"
+  git: dest="{{ php_mongo.basedir }}" repo="{{ php_mongo.repo }}"
 
 - name: "phpize the mongodb library"
-  command: "chdir=/tmp/mongo-php-driver phpize"
+  command: "chdir={{ php_mongo.basedir }} phpize"
 
 - name: "configure the mongodb library"
-  command: chdir=/tmp/mongo-php-driver ./configure
+  command: "chdir={{ php_mongo.basedir }} ./configure"
 
 - name: "make the mongodb library"
-  make: chdir=/tmp/mongo-php-driver
+  make: "chdir={{ php_mongo.basedir }}"
 
 - name: "install the mongodb library"
-  make: chdir=/tmp/mongo-php-driver target=install
+  make: "chdir={{ php_mongo.basedir }} target=install"
+  
+- name: "copy mongodb.so library to {{ php.extensiondir }}"
+  copy: src="{{ php_mongo.basedir }}/modules/mongodb.so" dest="{{ php.extensiondir }}/mongodb.so" mode=0777
 
 - name: "add a block to {{ php.ini }} if it does not exist"
   blockinfile:

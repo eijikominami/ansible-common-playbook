@@ -2,8 +2,11 @@
 
 php_mongo:
   repo: https://github.com/mongodb/mongo-php-driver.git
+  basedir: /tmp/mongo-php-driver
+  makefile: /tmp/mongo-php-driver/Makefile
 php:
   ini: /etc/php.ini
+  extensiondir: /usr/lib64/php/modules
 httpd:
   compile_from_src: false
   ctlbin: /usr/local/apache2/bin/apachectl
