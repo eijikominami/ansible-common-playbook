@@ -36,6 +36,9 @@
 - name: "install the PHP programs"
   make: chdir=/usr/local/src/php-{{ php.version }} target=install
 
+- name: "copy php.ini file"
+  copy: src="/usr/local/src/php-{{ php.version }}/php.ini-production" dest="{{ php.ini }}" mode=0644 
+
 # タイムゾーンと文字コードを指定  
 - name: "add a block to {{ php.ini }} if it does not exist"
   blockinfile:

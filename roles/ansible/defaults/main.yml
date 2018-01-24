@@ -2,3 +2,4 @@
 
 ansible:
   config: /etc/ansible/ansible.cfg
+  log: /var/log/ansible.log

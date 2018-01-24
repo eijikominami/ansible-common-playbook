@@ -2,6 +2,8 @@
 
 gitlab:
   url: https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/
+  repo_url: https://packages.gitlab.com/gitlab/gitlab-ce/el/{{ ansible_distribution_major_version }}/$basearch
+  repo_key: https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
   script: script.rpm.sh
   conf: /etc/gitlab/gitlab.rb
   erb: /opt/gitlab/embedded/cookbooks/gitlab/templates/default/gitlab.yml.erb

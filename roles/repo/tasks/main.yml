@@ -1,7 +1,7 @@
 # /common_playbook/roles/repo/tasks
 
 - name: "add epel repository"
-  yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" enabled=no
+  yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 - name: "install the latest version of createrepo, yum-utils, httpd"
   yum: name={{ item }} state=latest enablerepo=epel

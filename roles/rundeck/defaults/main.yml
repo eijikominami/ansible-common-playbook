@@ -1,7 +1,7 @@
 # /common_playbook/roles/rundeck/defaults
 
 rundeck:
-  reporpm: http://repo.rundeck.org/latest.rpm
-  reponame: rundeck-release-bintray
+  repo_url: https://dl.bintray.com/rundeck/rundeck-rpm
+  repo_key: http://rundeck.org/keys/BUILD-GPG-KEY-Rundeck.org.key
   conf : /etc/rundeck/rundeck-config.properties
   framework_conf : /etc/rundeck/framework.properties

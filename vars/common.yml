@@ -1,6 +1,8 @@
 # /common_playbook/vars
 
 - epel_repo: https://download.fedoraproject.org/pub/epel/{{ansible_distribution_major_version}}/{{ansible_architecture}}/
+  epel_key: http://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ansible_distribution_major_version}}
+  gpgcheck: false
   get_url_timeout: 30
   
   # for jenkins and rundeck

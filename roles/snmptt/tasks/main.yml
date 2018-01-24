@@ -9,9 +9,8 @@
 #
 ####################################
 
-# GPG KEYチェックなし
 - name: "add epel repository"
-  yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" enabled=no
+  yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 # SNMPTTのインストールに必要なパッケージ
 - name: "install the latest version of net-snmp-utils, net-snmp-perl, perl-Sys-Syslog, perl(SNMP), perl(XML::Simple)"

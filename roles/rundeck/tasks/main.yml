@@ -4,13 +4,10 @@
   yum: name=java-{{ jdk_ver }}-openjdk state=latest
 
 - name: "add rundeck repository"
-  yum: name={{ rundeck.reporpm }} state=present
-
-- name: "set rundeck repository disabled"
-  yum_repository: name={{ rundeck.reponame }} enabled=no
+  yum_repository: name=rundeck description=rundeck baseurl="{{ rundeck.repo_url }}" gpgkey="{{ rundeck.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 - name: "install the latest version of rundeck"
-  yum: name=rundeck state=latest enablerepo={{ rundeck.reponame }}
+  yum: name=rundeck state=latest enablerepo=rundeck
 
 - name: "grails.serverURL of {{ rundeck.conf }}"
   replace: dest="{{ rundeck.conf }}" regexp='grails.serverURL=.*$' replace="grails.serverURL=http://{{ ansible_default_ipv4.address }}:4440" backup=yes

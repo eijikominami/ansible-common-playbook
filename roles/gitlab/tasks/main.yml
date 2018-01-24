@@ -25,11 +25,8 @@
 - name: "execute gitlab installation script"
   command: "sh /tmp/{{ gitlab.script }}"
 
-- name: "set gitlab repository disabled"
-  yum_repository: name={{ item }} enabled=no
-  with_items:
-    - gitlab_gitlab-ce
-    - gitlab_gitlab-ce-source
+- name: "add gitlab_gitlab-ce repository"
+  yum_repository: name=gitlab_gitlab-ce description=gitlab_gitlab-ce baseurl="{{ gitlab.repo_url }}" gpgkey="{{ gitlab.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 # GitLab Community Editionのインストール
 - name: "install the latest version of gitlab-ce"

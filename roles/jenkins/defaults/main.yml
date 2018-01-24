@@ -2,12 +2,11 @@
 
 jenkins:
   sudoers: /etc/sudoers.d/jenkins
-  repourl: http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
-  reponame: jenkins
-  repokey: https://jenkins-ci.org/redhat/jenkins-ci.org.key
+  repo_url: http://pkg.jenkins-ci.org/redhat-stable
+  repo_key: https://jenkins-ci.org/redhat/jenkins-ci.org.key
   conf: /etc/sysconfig/jenkins
   port: 8080
 httpd:
   compile_from_src: false
   ctlbin: /usr/local/apache2/bin/apachectl
-  gitlab_conf: /etc/httpd/conf.d/jenkins.conf
+  jenkins_conf: /etc/httpd/conf.d/jenkins.conf

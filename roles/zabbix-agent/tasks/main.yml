@@ -7,11 +7,11 @@
 ####################################
 
 - name: "add zabbix repository"
-  yum_repository: name=zabbix description=zabbix baseurl="{{ zabbix.repo }}" enabled=no
+  yum_repository: name=zabbix description=zabbix baseurl="{{ zabbix.repo_url }}" gpgkey="{{ zabbix.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 # GPG KEYチェックなし
 - name: "install the latest version of zabbix-agent"
-  yum: name=zabbix-agent state=latest enablerepo=zabbix disable_gpg_check=yes
+  yum: name=zabbix-agent state=latest disable_gpg_check=yes enablerepo=zabbix
 
 # 接続するZabbixサーバのアドレスを指定
 - name: "edit Server of {{ zabbix.agentd_conf }}"

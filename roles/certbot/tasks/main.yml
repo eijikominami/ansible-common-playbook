@@ -1,7 +1,7 @@
 # /common_playbook/roles/certbot/tasks
 
 - name: "add epel repository"
-  yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" enabled=no
+  yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 - name: "install the latest version of certbot, python-certbot-apache"
   yum: name={{ item }} state=latest enablerepo=epel

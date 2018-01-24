@@ -14,17 +14,11 @@
     - java-{{ jdk_ver }}-openjdk
     - httpd
 
-- name: "download the jenkins repo file"
-  get_url: dest=/etc/yum.repos.d/ force=yes timeout={{  get_url_timeout  }} url="{{  jenkins.repourl  }}"
-
-- name: "set jenkins repository disabled"
-  yum_repository: name={{ jenkins.reponame }} enabled=no
-
-- name: "import a rpm key from a url"
-  rpm_key: state=present key="{{  jenkins.repokey  }}"
+- name: "add jenkins repository"
+  yum_repository: name=jenkins description=jenkins baseurl="{{ jenkins.repo_url }}" gpgkey="{{ jenkins.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 - name: "install the latest version of jenkins"
-  yum: name=jenkins state=latest enablerepo={{ jenkins.reponame }}
+  yum: name=jenkins state=latest enablerepo=jenkins
   notify:
     - restart jenkins
 
