@@ -1,0 +1,37 @@
+# /common_playbook/roles/drbd/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ drbd.partition }}
+#
+####################################
+
+- name: "add elrepo repository"
+  yum_repository: name=elrepo description=elrepo baseurl="{{ elrepo.repo_url }}" gpgkey="{{ elrepo.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
+
+- name: "install the latest version of kmod-drbd90, drbd90-utils"
+  yum: name={{ item }} state=latest enablerepo=elrepo
+  with_items:
+    - kmod-drbd90
+    - drbd90-utils
+
+# 論理ボリュームを作成
+- name: "create a drbd meta data volume"
+  lvol: vg=cl lv={{ drbd.metavol_name }} size={{ drbd.metavol_size }}
+
+- name: "put {{ drbd.global_conf }}"
+  template: src=global_common.conf.j2 dest="{{ drbd.global_conf }}"
+
+- name: "put {{ drbd.resource_dir }}{{ drbd.resource_name }}.res"
+  template: src=default.res.j2 dest="{{ drbd.resource_dir }}{{ drbd.resource_name }}.res"
+  with_items: "{{ drbd.partition }}"
+
+# プロンプトに自動応答
+- name: "create metadata"
+  expect:
+    command: drbdadm create-md all
+    timeout: 60
+    responses:
+      "^[need to type 'yes' to confirm].*": "yes"
+  ignore_errors: yes

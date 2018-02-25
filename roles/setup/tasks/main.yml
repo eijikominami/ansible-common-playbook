@@ -11,13 +11,21 @@
 - name: "install the latest version of @Development tools"
   yum: name="@Development tools" state=present
 
-- name: "install the latest version of wget, ntpdate, libselinux-python, git"
-  yum: name={{ item }} state=latest
+- name: "add epel repository"
+  yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
+
+- name: "install the latest version of wget, ntpdate, libselinux-python, git, python-pip"
+  yum: name={{ item }} state=latest enablerepo=epel
   with_items:
     - wget
     - ntpdate
     - libselinux-python
     - git
+    - python-pip
+
+# expactモジュールの利用に必要
+- name: "install pexpect package"
+  pip: name=pexpect
 
 - name: "stop service iptables"
   service: name={{ item }} enabled=no state=stopped

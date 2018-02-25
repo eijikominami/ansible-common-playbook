@@ -8,6 +8,14 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 - Let's Encryptコマンドをインストールします。
 - 証明書のインストールは別途コマンドの実行が必要です。
 
+## drdb
+- DRDBをインストールします。
+- プロジェクトごとに以下の値の設定が必要です。
+
+| 変数名 | 型 | 内容 | デフォルト値 |
+| ---- | ---- | ---- | ---- |
+| **drdb.partition** | array | 同期させるパーティションの情報 | 指定なし |
+
 ## fping
 - Zabbix Serverインストール時に必要となる、fpingをインストールします。
 - プロジェクトごとに以下の値の設定が必要です。
@@ -23,6 +31,8 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
 | **httpd.compile_from_src** | Bool | Apacheをソースから入れるか否か | 指定なし |
+| gitlab.email_from | String | 送信メール元アドレス | example@example.com |
+| gitlab.email_display_name | String | 送信メール名 | Example |
 
 ## httpd
 - Apacheをインストールします。
@@ -99,10 +109,12 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 > /var/lib/jenkins/secrets/initialAdminPassword
 
 - Proxyの設定
-- Pluginをインストール
+  - 「**Jenkinsの管理**」-「**プラグインの管理**」-「高度な設定」
+  - 「サーバ」は、http://等の記述は不要
+  - 「対象外ホスト」は、192.168.*等で記述する
+- オススメのPluginをインストール
 - ユーザの作成
-- AnsiColor Pluginのインストール
-- Gitlab Pluginのインストール
+- Gitlab Hook Pluginのインストール
 
 ## lsyncd
 - lsyncdをインストールします。

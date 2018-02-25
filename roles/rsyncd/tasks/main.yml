@@ -13,6 +13,7 @@
 
 - name: "put {{ rsyncd.conf }}"
   template: src=rsyncd.conf.j2 dest="{{ rsyncd.conf }}" owner=root group=root mode=0600
+  notify: restart rsyncd
 
 - name: "start service rsyncd, if not running"
   service: name=rsyncd state=started enabled=yes

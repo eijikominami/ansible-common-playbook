@@ -5,6 +5,8 @@
 # 
 # {{ httpd.compile_from_src }}
 # {{ httpd.gitlab_conf }}
+# {{ gitlab.gitlab_email_from }}
+# {{ gitlab.email_display_name }}
 #
 ####################################
 
@@ -35,28 +37,41 @@
     - configure and start gitlab
 
 # external_urlと設定値の間に"="は不要
+# External URL
 - name: "edit external_url in {{ gitlab.conf }}"
   replace: dest="{{ gitlab.conf }}" regexp='^external_url.*$' replace="external_url \"http://{{ ansible_default_ipv4.address }}/gitlab\"" backup=yes
   notify:
     - configure and start gitlab
 
+# Email address
+- name: "edit nginx listen port in {{ gitlab.conf }}"
+  replace: dest="{{ gitlab.conf }}" regexp='.*gitlab_rails\[\'gitlab_email_from\'\].*$' replace="gitlab_rails['gitlab_email_from'] = '{{ gitlab.email_from }}'" backup=yes
+  notify:
+    - configure and start gitlab
+
+# Email display name
+- name: "edit nginx listen port in {{ gitlab.conf }}"
+  replace: dest="{{ gitlab.conf }}" regexp='.*gitlab_rails\[\'gitlab_email_display_name\'\].*$' replace="gitlab_rails['gitlab_email_display_name'] = '{{ gitlab.email_display_name }}'" backup=yes
+  notify:
+    - configure and start gitlab
+
+# Nginx listen port
 - name: "edit nginx listen port in {{ gitlab.conf }}"
   replace: dest="{{ gitlab.conf }}" regexp='.*nginx\[\'listen_port\'\].*$' replace="nginx['listen_port'] = {{ gitlab.nginx_port }}" backup=yes
   notify:
     - configure and start gitlab
 
-- name: "edit nginx listen port in {{ gitlab.conf }}"
+# Nginx port
+- name: "edit nginx port in {{ gitlab.conf }}"
   replace: dest="{{ gitlab.conf }}" regexp='.*unicorn\[\'port\'\].*$' replace="unicorn['port'] = {{ gitlab.unicorn_port }}" backup=yes
   notify:
     - configure and start gitlab
 
+# Uncorn worker timeout
 - name: "edit uncorn worker timeiout in {{ gitlab.conf }}"
   replace: dest="{{ gitlab.conf }}" regexp='.*unicorn\[\'worker_timeout\'\].*$' replace="unicorn['worker_timeout'] = {{ gitlab.unicorn_worker_timeout }}" backup=yes
   notify:
     - configure and start gitlab
-
-- name: "edit nginx listen port in {{ gitlab.erb }}"
-  replace: dest="{{ gitlab.erb }}" regexp='.*unicorn\[\'port\'\].*$' replace="unicorn['port'] = {{ gitlab.unicorn_port }}" backup=yes
 
 - name: "put {{ httpd.gitlab_conf }}"
   template: src=gitlab.conf.j2 dest="{{ httpd.gitlab_conf }}"

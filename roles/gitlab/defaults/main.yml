@@ -7,6 +7,8 @@ gitlab:
   script: script.rpm.sh
   conf: /etc/gitlab/gitlab.rb
   erb: /opt/gitlab/embedded/cookbooks/gitlab/templates/default/gitlab.yml.erb
+  email_from: example@example.com
+  email_display_name: Example
   unicorn_port: 8888
   unicorn_worker_timeout: 180
   nginx_port: 10080

@@ -1,0 +1,11 @@
+# /common_playbook/roles/brbd/defaults
+
+drbd:
+  global_conf: /etc/drbd.d/global_common.conf
+  resource_dir: /etc/drbd.d/
+  resource_name: default
+  metavol_name: drbd
+  metavol_size: 1024
+elrepo:
+  repo_url: http://elrepo.org/linux/elrepo/el{{ansible_distribution_major_version}}/$basearch/
+  repo_key: https://www.elrepo.org/RPM-GPG-KEY-elrepo.org

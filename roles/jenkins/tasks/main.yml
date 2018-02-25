@@ -19,13 +19,9 @@
 
 - name: "install the latest version of jenkins"
   yum: name=jenkins state=latest enablerepo=jenkins
-  notify:
-    - restart jenkins
 
 - name: "edit JENKINS_ARGS in {{ jenkins.conf }}"
   replace: dest="{{ jenkins.conf }}" regexp='.*JENKINS_ARGS.*=.*$' replace="JENKINS_ARGS="--prefix=/jenkins"" backup=yes
-  notify:
-    - restart jenkins
 
 - name: "put {{ httpd.jenkins_conf }}"
   template: src=jenkins.conf.j2 dest="{{ httpd.jenkins_conf }}"

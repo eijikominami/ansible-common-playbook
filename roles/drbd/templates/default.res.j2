@@ -1,0 +1,15 @@
+resource {{ drbd.resource_name }} {
+{% for item in drbd.partition %}
+  volume {{ item.id }} {
+    device /dev/drbd{{ item.id }};
+    disk /dev/mapper/cl-{{ item.name }};
+    meta-disk /dev/mapper/cl-drbd [{{ item.id }}];
+  }
+{% endfor %}
+  on {{ pacemaker.primary_host }} {
+    address {{ pacemaker.primary_ip }}:7789;
+  }
+  on {{ pacemaker.secondary_host }} {
+    address {{ pacemaker.secondary_ip }}:7789;
+  }
+}

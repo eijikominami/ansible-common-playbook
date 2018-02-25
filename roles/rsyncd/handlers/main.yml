@@ -1,0 +1,4 @@
+# /common_playbook/roles/rsyncd/handlers
+
+- name: restart rsyncd
+  service: name=rsyncd state=restarted
