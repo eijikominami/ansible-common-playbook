@@ -1,7 +1,7 @@
 # /common_playbook/roles/ssl/defaults
 
 ssl:
-  version: 1.0.2n
-  source_url: https://www.openssl.org/source/openssl-1.0.2n.tar.gz
+  version: 1.0.2o
+  source_url: https://www.openssl.org/source/openssl-1.0.2o.tar.gz
   dir: /usr/local/ssl
   so_lib_dir: /etc/ld.so.conf

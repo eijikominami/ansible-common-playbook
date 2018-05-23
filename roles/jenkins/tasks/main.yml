@@ -41,8 +41,9 @@
   when: httpd.compile_from_src
 
 # sudoの実行を可能にする
+# パーミッションは440にする必要がある
 - name: "add a sudoers file if it does not exist"
-  copy: src=jenkins dest={{  jenkins.sudoers  }} owner=root group=root mode=0400
+  copy: src=jenkins dest={{  jenkins.sudoers  }} owner=root group=root mode=0440
 
 - name: "start service jenkins, if not running"
   service: name=jenkins state=started enabled=yes

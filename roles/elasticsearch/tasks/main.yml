@@ -1,0 +1,67 @@
+# /common_playbook/roles/elasticsearch/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ httpd.compile_from_src }}
+# {{ httpd.kibana_conf }}
+#
+####################################
+
+- name: "add elasticsearch repository"
+  yum_repository: name=elasticsearch description=elasticsearch baseurl="{{ elasticsearch.repo_url }}" gpgkey="{{ elasticsearch.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
+
+- name: "install the latest version of java-{{ jdk_ver }}-openjdk-devel, java-{{ jdk_ver }}-openjdk-debuginfo, elasticsearch, logstash, kibana, metricbeat, packetbeat, filebeat, heartbeat"
+  yum: name={{ item }} state=latest enablerepo=elasticsearch,base-debuginfo
+  with_items:
+    - java-{{ jdk_ver }}-openjdk-devel
+    - java-{{ jdk_ver }}-openjdk-debuginfo
+    - elasticsearch
+    - logstash
+    - kibana
+    - metricbeat
+    - packetbeat
+    - filebeat
+    - heartbeat
+
+- name: "put {{ httpd.kibana_conf }}"
+  template: src=kibana.conf.j2 dest="{{ httpd.kibana_conf }}"
+  notify:
+    - restart httpd
+    - restart apachectl daemon
+
+- name: "add a block to {{ httpd.conf }} if it does not exist"
+  blockinfile:
+    dest: "{{ httpd.conf }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK (KIBANA)"
+    backup: yes
+    block: |
+       Include {{ httpd.kibana_conf }}
+  notify:
+    - restart apachectl daemon
+  when: httpd.compile_from_src
+
+- name: "add a block to {{ elasticsearch.conf }} if it does not exist"
+  blockinfile:
+    dest: "{{ elasticsearch.conf }}"
+    backup: yes
+    block: |
+      network.host: "0.0.0.0"
+  notify:
+    - restart kibana
+
+- name: "add a block to {{ elasticsearch.kibana_conf }} if it does not exist"
+  blockinfile:
+    dest: "{{ elasticsearch.kibana_conf }}"
+    backup: yes
+    block: |
+      server.host: "0.0.0.0"
+      server.basePath: "/kibana"
+  notify:
+    - restart kibana
+
+- name: "start service elasticsearch, if not running"
+  service: name=elasticsearch state=started enabled=yes
+
+- name: "start service kibana, if not running"
+  service: name=kibana state=started enabled=yes

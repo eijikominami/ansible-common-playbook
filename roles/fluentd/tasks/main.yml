@@ -1,0 +1,25 @@
+# /common_playbook/roles/fluentd/tasks
+
+- name: "download the fluentd installation script"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ fluentd.source_url }}"
+
+# sudoは環境変数を引き継いでくれない。
+# sudoをsudo -Eに書き換えて環境変数を引き継ぐ。
+
+- name: "add sudo '-E' option in {{ fluentd.source_sh }}"
+  replace: dest="/tmp/{{ fluentd.source_sh }}" regexp='^sudo sh' replace="sudo -E sh" backup=yes
+
+- name: "execute gitlab installation script"
+  command: "sh /tmp/{{ fluentd.source_sh }}"
+
+- name: "install the latest version of gcc, libcurl-devel"
+  yum: name={{ item }} state=latest
+  with_items:
+    - gcc
+    - libcurl-devel
+
+- name: "execute fluent-plugin-elasticsearch installation script"
+  command: "td-agent-gem install fluent-plugin-elasticsearch"
+
+- name: "start service td-agent, if not running"
+  service: name=td-agent state=started enabled=yes

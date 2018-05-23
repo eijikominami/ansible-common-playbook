@@ -1,0 +1,5 @@
+# /common_playbook/roles/brbd/defaults
+
+fluentd:
+  source_url: http://toolbelt.treasuredata.com/sh/install-redhat-td-agent3.sh
+  source_sh: install-redhat-td-agent3.sh

@@ -5,5 +5,5 @@
   gpgcheck: false
   get_url_timeout: 30
   
-  # for jenkins and rundeck
+  # for jenkins, elasticsearch and rundeck
   jdk_ver: 1.8.0

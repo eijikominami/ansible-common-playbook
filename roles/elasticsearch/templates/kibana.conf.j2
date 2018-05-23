@@ -1,0 +1,10 @@
+# リバースプロキシ設定
+#
+# フォワードプロキシを禁止
+ProxyRequests off
+# nocanon : URLパスをエンコードせずにそのままアプリケーションサーバに渡す
+ProxyPass /kibana http://localhost:{{ elasticsearch.kibana_port }} nocanon
+# アプリケーションサーバからの応答時にLocation, Content-Location, URI ヘッダを調整
+ProxyPassReverse /(.*) http://localhost:{{ elasticsearch.kibana_port }}/kibana/(.*)
+# エンコード済みパス分離文字を許可
+AllowEncodedSlashes NoDecode

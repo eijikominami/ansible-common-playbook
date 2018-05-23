@@ -1,0 +1,13 @@
+# /common_playbook/roles/elasticsearch/defaults
+
+elasticsearch:
+  repo_url: https://artifacts.elastic.co/packages/5.x/yum
+  repo_key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+  conf: /etc/elasticsearch/elasticsearch.yml
+  port: 9200
+  kibana_port: 5601
+  kibana_conf: /etc/kibana/kibana.yml
+httpd:
+  compile_from_src: false
+  ctlbin: /usr/local/apache2/bin/apachectl
+  kibana_conf: /etc/httpd/conf.d/kibana.conf

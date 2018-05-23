@@ -16,6 +16,15 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | ---- | ---- | ---- | ---- |
 | **drdb.partition** | array | 同期させるパーティションの情報 | 指定なし |
 
+## Elasticsearch
+- Elasticsearchをインストールします。
+- プロジェクトごとに以下の値の設定が必要です。
+
+| 変数名 | 型 | 内容 | デフォルト値 |
+| ---- | ---- | ---- | ---- |
+| **httpd.compile_from_src** | Bool | Apacheをソースから入れるか否か | false |
+| httpd.kibana_conf | String | Kibana用Apache Configファイルのパス | /etc/httpd/conf.d/kibana.conf |
+
 ## fping
 - Zabbix Serverインストール時に必要となる、fpingをインストールします。
 - プロジェクトごとに以下の値の設定が必要です。
@@ -100,7 +109,8 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
-| **httpd.compile_from_src** | Bool | Apacheをソースから入れるか否か | 指定なし |
+| **httpd.compile_from_src** | Bool | Apacheをソースから入れるか否か | false |
+| httpd.jenkins_conf | String | Jenkins用Apache Configファイルのパス | /etc/httpd/conf.d/jenkins.conf |
 
 ### インストール後に行う設定
 - Unlock Jenkins
@@ -129,6 +139,7 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 ## mariadb
 - MariaDBをインストールします。
+- このRoleを実行すると**Postfix**が削除されてしまう場合があるので注意してください。
 - プロジェクトごとに以下の値の設定が必要です。詳細は該当のPlaybookを参照してください。
 
 | 変数名 | 型 | 内容 | デフォルト値 |

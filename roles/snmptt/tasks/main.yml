@@ -77,13 +77,15 @@
   notify:
     - restart snmptt
 
-- name: "add a block to {{ snmptt.conf }} if it does not exist"
-  blockinfile:
-    dest: "{{ snmptt.conf }}"
-    backup: yes
-    block: |
-       EVENT general .* "General event" Normal 
-       FORMAT ZBXTRAP $aA $ar $1
+# 日付フォーマットを指定
+- name: "edit date_time_format of {{ snmptt.ini }}"
+  replace: dest="{{ snmptt.ini }}" regexp='.*date_time_format =.*$' replace="date_time_format = %H:%M:%S %Y/%m/%d" backup=yes
+  notify:
+    - restart snmptt
+
+# snmptt.log上の[ZBXTRAP] [IPアドレス]が記された行のみZabbixサーバに取り込まれる
+- name: "add a {{ snmptt.conf }} file if it does not exist"
+  copy: src=snmptt.conf dest={{ snmptt.conf }} owner=root group=root mode=0644
   notify:
     - restart snmptt
 

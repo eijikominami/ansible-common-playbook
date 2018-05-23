@@ -5,4 +5,5 @@ php:
   max_execution_time: 300
   max_input_time: 300
   post_max_size: 16M
+  memory_limit: 256M
   timezone: Asia/Tokyo
