@@ -15,5 +15,5 @@ mariadb:
   srv_conf: /etc/my.cnf.d/server.cnf
   sock: /var/lib/mysql/mysql.sock
   ulimit_dir: /etc/systemd/system/mariadb.service.d
-  repo_url: http://yum.mariadb.org/10.2/centos7-amd64
+  repo_url: http://yum.mariadb.org/10.3/centos7-amd64
   repo_key: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB

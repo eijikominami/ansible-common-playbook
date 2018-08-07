@@ -3,6 +3,15 @@
 # - name: "upgrade all packages"
 #   yum: name=* state=latest
 
+# Amazon Linuxの判定
+- name: "change ansible_distribution_major_version at Amazon Linux"
+  set_fact: ansible_distribution_major_version=6
+  when: ansible_distribution == 'Amazon' and ansible_service_mgr == 'upstart'
+
+- name: "change ansible_distribution_major_version at Amazon Linux2"
+  set_fact: ansible_distribution_major_version=7
+  when: ansible_distribution == 'Amazon' and ansible_service_mgr == 'systemd'
+
 # CentOS7では初期状態では実行権限が付与されていない
 - name: "add mode the /etc/rc.d/rc.local file executable"
   file: dest=/etc/rc.d/rc.local mode="u+x"
@@ -32,11 +41,11 @@
   with_items:
     - iptables
     - ip6tables
-  when: ansible_distribution_major_version == "6"
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "6"
 
 - name: "stop service firewalld"
   service: name=firewalld enabled=no state=stopped
-  when: ansible_distribution_major_version == "7"
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
 
 - name: "retrieve selinux config"
   stat: path=/etc/selinux/config

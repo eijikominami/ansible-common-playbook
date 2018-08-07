@@ -5,3 +5,9 @@ rundeck:
   repo_key: http://rundeck.org/keys/BUILD-GPG-KEY-Rundeck.org.key
   conf : /etc/rundeck/rundeck-config.properties
   framework_conf : /etc/rundeck/framework.properties
+  profile: /etc/rundeck/profile
+  port: 4440
+httpd:
+  compile_from_src: false
+  ctlbin: /usr/local/apache2/bin/apachectl
+  rundeck_conf: /etc/httpd/conf.d/rundeck.conf

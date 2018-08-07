@@ -91,20 +91,20 @@
   when: not httpd.compiled
 
 - name: "show version number of PHP"
-  command: php -v
+  command: /usr/local/bin/php -v
   register: php_version
   changed_when: false
 
 - name: "debug version number of PHP"
   debug: var=php_version.stdout_lines
-  when: php_version | success
+  when: php_version is success
 
 - name: "show all loaded modules of PHP"
-  command: php -m
+  command: /usr/local/bin/php -m
   register: php_module
   changed_when: false
 
 - name: "debug all loaded modules of PHP"
   debug: var=php_module.stdout_lines
-  when: php_module | success
+  when: php_module is success
 

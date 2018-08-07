@@ -1,8 +1,8 @@
 # /common_playbook/roles/httpd/defaults
 
 httpd:
-  version: 2.4.33
-  source_url: http://ftp.jaist.ac.jp/pub/apache/httpd/httpd-2.4.33.tar.gz
+  version: 2.4.34
+  source_url: http://ftp.jaist.ac.jp/pub/apache/httpd/httpd-2.4.34.tar.gz
   user: apache
   base_dir: /usr/local/apache2
   doc_root: /usr/local/apache2/htdocs

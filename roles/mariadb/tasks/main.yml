@@ -85,4 +85,4 @@
 
 - name: "debug full status of mariadb"
   debug: var=mariadb_status.stdout_lines
-  when: mariadb_status | success
+  when: mariadb_status is success

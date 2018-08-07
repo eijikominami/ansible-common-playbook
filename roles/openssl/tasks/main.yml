@@ -45,5 +45,5 @@
 
 - name: "debug version of openssl"
   debug: var=openssl_version.stdout_lines
-  when: openssl_version | success
+  when: openssl_version is success
   

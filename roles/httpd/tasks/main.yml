@@ -176,8 +176,8 @@
   when: httpd.ssl_enabled and not crt_stat.stat.exists
 
 - name: "copy server.key file"
-  copy: src=/tmp/server.crt dest="{{ httpd.conf_dir }}/server.key" mode=0400
-  when: httpd.ssl_enabled and not crt_stat.stat.exists
+  copy: src=/tmp/server.key dest="{{ httpd.conf_dir }}/server.key" mode=0400
+  when: httpd.ssl_enabled and not key_stat.stat.exists
 
 - name: "add apachectl script in rc.local"
   lineinfile: 
@@ -236,7 +236,7 @@
 
 - name: "debug version number of Apache"
   debug: var=httpd_version.stdout_lines
-  when: httpd_version | success
+  when: httpd_version is success
 
 - name: "show all loaded modules of Apache"
   command: "{{ httpd.ctlbin }} -M"
@@ -245,7 +245,7 @@
 
 - name: "debug all loaded modules of Apache"
   debug: var=httpd_module.stdout_lines
-  when: httpd_module | success
+  when: httpd_module is success
 
 - name: "show full status of Apache"
   command: "{{ httpd.ctlbin }} fullstatus"
@@ -254,5 +254,5 @@
 
 - name: "debug full status of Apache"
   debug: var=httpd_fullstatus.stdout_lines
-  when: httpd_fullstatus | success
+  when: httpd_fullstatus is success
   

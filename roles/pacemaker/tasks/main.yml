@@ -65,4 +65,4 @@
 
 - name: "debug status of pacemaker"
   debug: var=pcs_status.stdout_lines
-  when: pcs_status | success
+  when: pcs_status is success

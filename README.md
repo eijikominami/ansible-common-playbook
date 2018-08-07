@@ -255,6 +255,12 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 ## rundeck
 - Rundeckをインストールします。
+- プロジェクトごとに以下の値の設定が必要です。
+
+| 変数名 | 型 | 内容 | デフォルト値 |
+| ---- | ---- | ---- | ---- |
+| **httpd.compile_from_src** | Bool | Apacheをソースから入れるか否か | false |
+| httpd.rundeck_conf | String | Jenkins用Apache Configファイルのパス | /etc/httpd/conf.d/rundeck.conf |
 
 ## setup
 - OSインストール直後に行う必要のある、基本パッケージのインストール、およびセキュリティ設定をします。
