@@ -1,0 +1,7 @@
+/var/log/td-agent/* {
+    missingok
+    dateext
+    notifempty
+    sharedscripts
+    delaycompress
+}

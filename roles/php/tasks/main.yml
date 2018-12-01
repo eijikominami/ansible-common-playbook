@@ -18,6 +18,13 @@
 #
 ####################################
 
+- name: "remove the PHP package"
+  yum: name={{ packages }} state=absent
+  vars:
+    packages:
+      - php
+      - php-*
+
 - name: "delete the PHP source files"
   file: path=/usr/local/src/php-{{ php.version }} state=absent
 
@@ -37,12 +44,12 @@
   make: chdir=/usr/local/src/php-{{ php.version }} target=install
 
 - name: "copy php.ini file"
-  copy: src="/usr/local/src/php-{{ php.version }}/php.ini-production" dest="{{ php.ini }}" mode=0644 
+  copy: remote_src=yes src="/usr/local/src/php-{{ php.version }}/php.ini-production" dest="{{ php.ini }}" mode=0644 
 
 # タイムゾーンと文字コードを指定  
 - name: "add a block to {{ php.ini }} if it does not exist"
   blockinfile:
-    dest: "{{ php.ini }}"
+    path: "{{ php.ini }}"
     marker: "; {mark} ANSIBLE MANAGED BLOCK"
     backup: yes
     block: |
@@ -56,21 +63,21 @@
 
 # PHPバージョンを表示しない
 - name: "disable expose_php in {{ php.ini }}"
-  replace: dest="{{ php.ini }}" regexp='^expose_php = .*$' replace="expose_php = Off" backup=yes
+  replace: path="{{ php.ini }}" regexp='^expose_php = .*$' replace="expose_php = Off" backup=yes
 
 # ファイルアップロードを許可しない
 - name: "disable file_uploads in {{ php.ini }}"
-  replace: dest="{{ php.ini }}" regexp='^file_uploads = .*$' replace="file_uploads = Off" backup=yes
+  replace: path="{{ php.ini }}" regexp='^file_uploads = .*$' replace="file_uploads = Off" backup=yes
   when: php.file_uploads_disabled
 
 # MySQL sock fileを指定
 - name: "edit location of mysql sock file in {{ php.ini }}" 
-  replace: dest="{{ php.ini }}" regexp='mysqli.default_socket =$' replace="mysqli.default_socket = {{ mariadb.sock }}" backup=yes
+  replace: path="{{ php.ini }}" regexp='mysqli.default_socket =$' replace="mysqli.default_socket = {{ mariadb.sock }}" backup=yes
   when: php.mysql_enabled
 
 - name: "add a block to {{ httpd.conf }} if it does not exist"
   blockinfile:
-    dest: "{{ httpd.conf }}"
+    path: "{{ httpd.conf }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK (PHP) "
     backup: yes
     block: |
@@ -80,7 +87,7 @@
       </FilesMatch>
 
 - name: "edit DirectoryIndex of {{ httpd.conf }}"
-  replace: dest="{{ httpd.conf }}" regexp='DirectoryIndex index.html.*$' replace="DirectoryIndex index.html index.php" backup=yes
+  replace: path="{{ httpd.conf }}" regexp='DirectoryIndex index.html.*$' replace="DirectoryIndex index.html index.php" backup=yes
 
 - name: "restart service apachectl"
   command: "{{ httpd.ctlbin }} graceful"

@@ -61,6 +61,7 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | httpd.max_request_workers | String | 応答可能な同時リクエスト数 | 250 |
 | httpd.server_limit | String | MaxRequestWorkers に設定可能な上限値 | 256 |
 | httpd.max_connections_per_child | String | 子プロセスが扱うことのできるリクエスト数の上限 | 0（無限） |
+| httpd.cros | String | クロスドメインを許可するURL | null |
 | **ssl.dir** | String | SSLのインストールディレクト(httpd.ssl_enabled=trueのときのみ) | 指定なし |
 
 ### 静的モジュール
@@ -236,7 +237,9 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
-| **httpd.compile_from_src** | Bool | Apacheをソースから入れるか否か | 指定なし |
+| httpd.compile_from_src | Bool | Apacheをソースから入れるか否か | false |
+| php.phpize | String | phpizeのパス | /usr/bin/phpize |
+| php.php_config | String | php-configのパス | /usr/bin/php-config |
 
 ## repo
 - CentOS7リポジトリを設定します。

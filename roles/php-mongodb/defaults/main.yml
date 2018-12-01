@@ -7,6 +7,8 @@ php_mongo:
 php:
   ini: /etc/php.ini
   extensiondir: /usr/lib64/php/modules
+  phpize: /usr/bin/phpize
+  php_config: /usr/bin/php-config
 httpd:
   compile_from_src: false
   ctlbin: /usr/local/apache2/bin/apachectl

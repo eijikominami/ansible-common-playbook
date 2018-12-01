@@ -4,8 +4,13 @@
 # 以下の値は、各プロジェクトごとに指定すること
 # 
 # {{ httpd.compile_from_src }}
+# {{ php.phpize }}
+# {{ php.php-config }}
 #
 ####################################
+
+- name: "install the latest version of re2c"
+  yum: name=re2c state=latest enablerepo=epel
 
 - name: "delete the mongodb library source files"
   file: path="{{ php_mongo.basedir }}" state=absent
@@ -14,10 +19,10 @@
   git: dest="{{ php_mongo.basedir }}" repo="{{ php_mongo.repo }}"
 
 - name: "phpize the mongodb library"
-  command: "chdir={{ php_mongo.basedir }} phpize"
+  command: "chdir={{ php_mongo.basedir }} {{ php.phpize }}"
 
 - name: "configure the mongodb library"
-  command: "chdir={{ php_mongo.basedir }} ./configure"
+  command: "chdir={{ php_mongo.basedir }} ./configure --with-php-config={{ php.php_config }}"
 
 - name: "make the mongodb library"
   make: "chdir={{ php_mongo.basedir }}"
@@ -26,11 +31,11 @@
   make: "chdir={{ php_mongo.basedir }} target=install"
   
 - name: "copy mongodb.so library to {{ php.extensiondir }}"
-  copy: src="{{ php_mongo.basedir }}/modules/mongodb.so" dest="{{ php.extensiondir }}/mongodb.so" mode=0777
+  copy: src="{{ php_mongo.basedir }}/modules/mongodb.so" remote_src=yes dest="{{ php.extensiondir }}/mongodb.so" mode=0777
 
 - name: "add a block to {{ php.ini }} if it does not exist"
   blockinfile:
-    dest: "{{ php.ini }}"
+    path: "{{ php.ini }}"
     marker: "; {mark} ANSIBLE MANAGED BLOCK (MONGODB)"
     backup: yes
     block: |

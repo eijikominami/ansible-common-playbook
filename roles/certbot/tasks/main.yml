@@ -4,7 +4,8 @@
   yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 - name: "install the latest version of certbot, python-certbot-apache"
-  yum: name={{ item }} state=latest enablerepo=epel
-  with_items:
-    - certbot
-    - python-certbot-apache
+  yum: name={{ packages }} state=latest enablerepo=epel
+  vars:
+    packages:
+      - certbot
+      - python-certbot-apache

@@ -11,12 +11,13 @@
 
 # Zabbixのインストールに必要なパッケージ
 - name: "install the latest version of libxml2-devel, net-snmp, net-snmp-devel, libcurl-devel"
-  yum: name={{ item }} state=latest
-  with_items:
-    - libxml2-devel
-    - net-snmp
-    - net-snmp-devel
-    - libcurl-devel
+  yum: name={{ packages }} state=latest
+  vars:
+    packages:
+      - libxml2-devel
+      - net-snmp
+      - net-snmp-devel
+      - libcurl-devel
 
 - name: "show version of zabbix"
   command: "/usr/local/sbin/zabbix_server -V"
@@ -52,13 +53,13 @@
 # OS起動時にZabbixユーザでZabbixを実行
 - name: "add zabbix_server in rc.local"
   lineinfile: 
-     dest: /etc/rc.local
+     path: /etc/rc.local
      line: "su -l zabbix -c 'zabbix_server'"
      backup: yes
 
 - name: "add zabbix_agentd in rc.local"
   lineinfile: 
-     dest: /etc/rc.local
+     path: /etc/rc.local
      line: "su -l zabbix -c 'zabbix_agentd'"
      backup: yes
 
@@ -86,7 +87,7 @@
 
 # ディレクトリ作成
 - name: "create zabbix file directory"
-  file: dest="{{ zabbix.dir }}" state=directory owner=zabbix group=zabbix mode=0755
+  file: path="{{ zabbix.dir }}" state=directory owner=zabbix group=zabbix mode=0755
 
 # ワイルドカード(*)使用時はshellコマンドを使用
 # ansibleのcopyコマンドは再帰的なディレクトリコピーに非対応
@@ -96,7 +97,7 @@
   shell: "/bin/cp -R /usr/local/src/zabbix-{{ zabbix.version }}/frontends/php/* {{ zabbix.dir }}"
 
 - name: "change owner of zabbix contents directory"
-  file: dest="{{ zabbix.dir }}" state=directory owner=zabbix group=zabbix recurse=yes
+  file: path="{{ zabbix.dir }}" state=directory owner=zabbix group=zabbix recurse=yes
 
 # [1] ZabbixにMySQLパスワードを設定
 #
@@ -105,7 +106,7 @@
 #     zbx_mem_realloc(): please increase CacheSize configuration parameter
 - name: "add a block to {{ zabbix.conf }} if it does not exist"
   blockinfile:
-    dest: "{{ zabbix.conf }}"
+    path: "{{ zabbix.conf }}"
     backup: yes
     block: |
       DBPassword={{ zabbix.mariadb_pass }}
@@ -114,7 +115,7 @@
       CacheSize={{ zabbix.cache_size }}
 
 - name: "create log file directory"
-  file: dest="{{ zabbix.log_dir }}" state=directory owner=zabbix group=zabbix mode=0755
+  file: path="{{ zabbix.log_dir }}" state=directory owner=zabbix group=zabbix mode=0755
 
 - name: "edit LogFile location in {{ zabbix.conf }}"
-  replace: dest="{{ zabbix.conf }}" regexp='^LogFile=.*$' replace="LogFile={{ zabbix.log_dir }}/zabbix_server.log" backup=yes
+  replace: path="{{ zabbix.conf }}" regexp='^LogFile=.*$' replace="LogFile={{ zabbix.log_dir }}/zabbix_server.log" backup=yes

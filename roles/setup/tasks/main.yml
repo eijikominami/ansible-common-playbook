@@ -1,8 +1,5 @@
 # /common_playbook/roles/setup/tasks
 
-# - name: "upgrade all packages"
-#   yum: name=* state=latest
-
 # Amazon Linuxの判定
 - name: "change ansible_distribution_major_version at Amazon Linux"
   set_fact: ansible_distribution_major_version=6
@@ -14,7 +11,7 @@
 
 # CentOS7では初期状態では実行権限が付与されていない
 - name: "add mode the /etc/rc.d/rc.local file executable"
-  file: dest=/etc/rc.d/rc.local mode="u+x"
+  file: path=/etc/rc.d/rc.local mode="u+x"
 
 # @Development toolsはstate=presentを指定
 - name: "install the latest version of @Development tools"
@@ -24,13 +21,14 @@
   yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 - name: "install the latest version of wget, ntpdate, libselinux-python, git, python-pip"
-  yum: name={{ item }} state=latest enablerepo=epel
-  with_items:
-    - wget
-    - ntpdate
-    - libselinux-python
-    - git
-    - python-pip
+  yum: name={{ packages }} state=latest enablerepo=epel
+  vars:
+    packages:
+      - wget
+      - ntpdate
+      - libselinux-python
+      - git
+      - python-pip
 
 # expactモジュールの利用に必要
 - name: "install pexpect package"
@@ -54,7 +52,7 @@
 # historyコマンドに時刻情報を付加する
 - name: "add a block to /etc/bashrc if it does not exist"
   blockinfile:
-    dest: /etc/bashrc
+    path: /etc/bashrc
     backup: yes
     block: |
       HISTSIZE=50000

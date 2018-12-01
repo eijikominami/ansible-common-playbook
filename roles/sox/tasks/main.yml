@@ -5,13 +5,14 @@
 
 # スクリプト実行に必要なパッケージ
 - name: "install the latest version of usbutils, alsa-lib-devel, alsa-utils, gcc-c++, libmad, libmad-devel, libid3tag, libid3tag-devel, lame, lame-devel, flac-devel, libvorbis-devel"
-  yum: name={{ item }} state=latest enablerepo=epel
-  with_items:
-    - gcc-c++
-    - libid3tag
-    - libid3tag-devel
-    - flac-devel
-    - libvorbis-devel
+  yum: name={{ packages }} state=latest enablerepo=epel
+  vars:
+    packages:
+      - gcc-c++
+      - libid3tag
+      - libid3tag-devel
+      - flac-devel
+      - libvorbis-devel
 
 - name: "download the sox source files"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ sox.source_url }}"

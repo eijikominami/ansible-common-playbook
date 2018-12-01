@@ -11,10 +11,11 @@
   yum_repository: name=elrepo description=elrepo baseurl="{{ elrepo.repo_url }}" gpgkey="{{ elrepo.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 - name: "install the latest version of kmod-drbd90, drbd90-utils"
-  yum: name={{ item }} state=latest enablerepo=elrepo
-  with_items:
-    - kmod-drbd90
-    - drbd90-utils
+  yum: name={{ packages }} state=latest enablerepo=elrepo
+  vars:
+    packages:
+      - kmod-drbd90
+      - drbd90-utils
 
 # 論理ボリュームを作成
 - name: "create a drbd meta data volume"

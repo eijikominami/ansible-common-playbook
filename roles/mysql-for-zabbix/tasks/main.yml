@@ -2,16 +2,17 @@
 
 # mysqlの使用に必要なパッケージ
 - name: "install the latest version of mysql, mysql-server, mysql-devel, MySQL-python27"
-  yum: name={{ item }} state=latest
-  with_items:
-    - mysql
-    - mysql-server
-    - mysql-devel
-    - MySQL-python27
+  yum: name={{ packages }} state=latest
+  vars:
+    packages:
+      - mysql
+      - mysql-server
+      - mysql-devel
+      - MySQL-python27
 
 - name: "add a block to {{ mysqld.conf }} if it does not exist"
   blockinfile:
-    dest: "{{mysqld_conf}}"
+    path: "{{mysqld_conf}}"
     backup: yes
     insertafter: '\[mysqld\]'
     block: |

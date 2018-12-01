@@ -1,10 +1,11 @@
 # /common_playbook/roles/vsftpd/tasks
 
 - name: "install the latest version of vsftpd, ftp"
-  yum: name={{ item }} state=latest
-  with_items:
-    - vsftpd
-    - ftp
+  yum: name={{ packages }} state=latest
+  vars:
+    packages:
+      - vsftpd
+      - ftp
 
 - name: "put {{ vsftpd.conf }}"
   template: src=vsftpd.conf.j2 dest="{{ vsftpd.conf }}" owner=root group=root mode=0600

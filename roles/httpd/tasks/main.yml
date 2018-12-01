@@ -15,6 +15,7 @@
 # {{ httpd.max_request_workers }}
 # {{ httpd.server_limit }}
 # {{ httpd.max_connections_per_child }}
+# {{ httpd.cros }}
 # {{ ssl.dir }}
 #
 # SSLの証明書やキーを配置する場合は、
@@ -25,12 +26,13 @@
 # expat-devel	: Perl 5 互換の正規表現をC言語で実装したライブラリ	-> Apacheのコンパイルに使用
 # lynx			: テキストベースブラウザ							-> Apache Statusの確認に使用
 - name: "install the latest version of pcre-devel, lynx, logrotate"
-  yum: name={{ item }} state=latest
-  with_items:
-    - pcre-devel
-    - expat-devel
-    - lynx
-    - logrotate
+  yum: name={{ packages }} state=latest
+  vars:
+    packages:
+      - pcre-devel
+      - expat-devel
+      - lynx
+      - logrotate
 
 - name: "delete the Apache source files"
   file: path=/usr/local/src/httpd-{{ httpd.version }} state=absent
@@ -181,7 +183,7 @@
 
 - name: "add apachectl script in rc.local"
   lineinfile: 
-     dest: /etc/rc.local
+     path: /etc/rc.local
      line: "{{ httpd.ctlbin }} start"
      backup: yes
 

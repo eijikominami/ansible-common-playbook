@@ -26,7 +26,7 @@
 # ソースコンパイル時は実行ファイルのパスが通常と異なる
 - name: "add fping location in {{ zabbix.conf }}"
   lineinfile: 
-     dest: "{{ zabbix.conf }}"
+     path: "{{ zabbix.conf }}"
      line: "FpingLocation={{ fping.bin }}"
      backup: yes
 
@@ -34,4 +34,4 @@
 # SUID（Set User ID）設定を行いrootユーザで実行する
 # [エラーメッセージ]　can't create socket (must run as root?))
 - name: "set user id to {{ fping.bin }}"
-  file: dest={{ fping.bin }} mode=4755
+  file: path={{ fping.bin }} mode=4755

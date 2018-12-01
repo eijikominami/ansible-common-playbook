@@ -15,13 +15,13 @@
 
 # 接続するZabbixサーバのアドレスを指定
 - name: "edit Server of {{ zabbix.agentd_conf }}"
-  replace: dest="{{ zabbix.agentd_conf }}" regexp='^Server=.*$' replace="Server={{ zabbix.server }}" backup=yes
+  replace: path="{{ zabbix.agentd_conf }}" regexp='^Server=.*$' replace="Server={{ zabbix.server }}" backup=yes
 
 - name: "edit ServerActive of {{ zabbix.agentd_conf }}"
-  replace: dest="{{ zabbix.agentd_conf }}" regexp='^ServerActive=.*$' replace="ServerActive={{ zabbix.server }}" backup=yes
+  replace: path="{{ zabbix.agentd_conf }}" regexp='^ServerActive=.*$' replace="ServerActive={{ zabbix.server }}" backup=yes
 
 - name: "edit Hostname of {{zabbix.agentd_conf}}"
-  replace: dest="{{ zabbix.agentd_conf }}" regexp='^Hostname=.*$' replace="Hostname={{ ansible_hostname }}" backup=yes
+  replace: path="{{ zabbix.agentd_conf }}" regexp='^Hostname=.*$' replace="Hostname={{ ansible_hostname }}" backup=yes
 
 - name: "start service zabbix-agent, if not running"
   service: name=zabbix-agent state=started enabled=yes

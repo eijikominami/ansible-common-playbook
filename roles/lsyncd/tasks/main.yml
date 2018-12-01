@@ -11,14 +11,15 @@
 ####################################
 
 - name: "install the latest version of cmake, lua, lua-devel, asciidoc, gcc, logrotate"
-  yum: name={{ item }} state=latest
-  with_items:
-    - cmake
-    - lua
-    - lua-devel
-    - asciidoc
-    - gcc
-    - logrotate
+  yum: name={{ packages }} state=latest
+  vars:
+    packages:
+      - cmake
+      - lua
+      - lua-devel
+      - asciidoc
+      - gcc
+      - logrotate
 
 - name: "delete the lsyncd source files"
   file: path=/usr/local/src/lsyncd-master state=absent
@@ -43,7 +44,7 @@
 
 - name: "add a block to {{ lsyncd.conf }} if it does not exist"
   blockinfile:
-    dest: "{{ lsyncd.conf }}"
+    path: "{{ lsyncd.conf }}"
     owner: "{{ lsyncd.exec_user }}"
     group: "{{ lsyncd.exec_user }}"
     backup: yes
@@ -62,7 +63,7 @@
 
 - name: "add a block to {{ lsyncd.conf }} if it does not exist"
   blockinfile:
-    dest: "{{ lsyncd.conf }}"
+    path: "{{ lsyncd.conf }}"
     owner: "{{ lsyncd.exec_user }}"
     group: "{{ lsyncd.exec_user }}"
     backup: yes

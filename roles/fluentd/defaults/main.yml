@@ -1,5 +1,8 @@
-# /common_playbook/roles/brbd/defaults
+# /common_playbook/roles/fluentd/defaults
 
 fluentd:
+  init: /etc/init.d/td-agent
+  systemd: /lib/systemd/system/td-agent.service
+  logrotate: /etc/logrotate.d/td-agent
   source_url: http://toolbelt.treasuredata.com/sh/install-redhat-td-agent3.sh
   source_sh: install-redhat-td-agent3.sh

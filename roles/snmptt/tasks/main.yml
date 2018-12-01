@@ -14,23 +14,25 @@
 
 # SNMPTTのインストールに必要なパッケージ
 - name: "install the latest version of net-snmp-utils, net-snmp-perl, perl-Sys-Syslog, perl(SNMP), perl(XML::Simple)"
-  yum: name={{ item }} state=latest
-  with_items:
-    - net-snmp-utils
-    - net-snmp-perl
-    - perl-Sys-Syslog
-    - perl(SNMP)
-    - perl(XML::Simple)
+  yum: name={{ packages }} state=latest
+  vars:
+    packages:
+      - net-snmp-utils
+      - net-snmp-perl
+      - perl-Sys-Syslog
+      - perl(SNMP)
+      - perl(XML::Simple)
 
 - name: "install the latest version of snmptt"
-  yum: name={{ item }} state=latest enablerepo=epel
-  with_items:
-    - snmptt
+  yum: name={{ packages }} state=latest enablerepo=epel
+  vars:
+    packages:
+      - snmptt
 
 # 全てのTrapデータをSNMPTTに転送
 - name: "add a block to {{ snmptrapd.conf }} file if it does not exist"
   blockinfile:
-    dest: "{{ snmptrapd.conf }}"
+    path: "{{ snmptrapd.conf }}"
     backup: yes
     block: |
        disableAuthorization yes
@@ -47,7 +49,7 @@
 # -M		読み込むMIBファイルがあるディレクトリ
 - name: "add a block to {{ snmptrapd.script }} if it does not exist"
   blockinfile:
-    dest: "{{ snmptrapd.script }}"
+    path: "{{ snmptrapd.script }}"
     backup: yes
     block: |
        OPTIONS="-m +ALL -Lsd -On -p /var/run/snmptrapd.pid -M /usr/share/snmp/mibs:{{ snmp.vendormibs }}"
@@ -56,30 +58,30 @@
 
 # SNMP Handler経由の場合はdaemonを指定
 - name: "edit mode of {{ snmptt.ini }}"
-  replace: dest="{{ snmptt.ini }}" regexp='mode = .*$' replace="mode = daemon" backup=yes
+  replace: path="{{ snmptt.ini }}" regexp='mode = .*$' replace="mode = daemon" backup=yes
   notify:
     - restart snmptt
 
 # NetSNMPでPerlモジュールを使用する
 - name: "edit net_snmp_perl_enable of {{ snmptt.ini }}"
-  replace: dest="{{ snmptt.ini }}" regexp='net_snmp_perl_enable = .*$' replace="net_snmp_perl_enable = 1" backup=yes
+  replace: path="{{ snmptt.ini }}" regexp='net_snmp_perl_enable = .*$' replace="net_snmp_perl_enable = 1" backup=yes
   notify:
     - restart snmptt
 
 - name: "edit net_snmp_perl_best_guess of {{ snmptt.ini }}"
-  replace: dest="{{ snmptt.ini }}" regexp='net_snmp_perl_best_guess = .*$' replace="net_snmp_perl_best_guess = 2" backup=yes
+  replace: path="{{ snmptt.ini }}" regexp='net_snmp_perl_best_guess = .*$' replace="net_snmp_perl_best_guess = 2" backup=yes
   notify:
     - restart snmptt
 
 # Syslogへは、snmptrapdがログ書き込みを行う
 - name: "edit syslog_enable of {{ snmptt.ini }}"
-  replace: dest="{{ snmptt.ini }}" regexp='syslog_enable = .*$' replace="syslog_enable = 0" backup=yes
+  replace: path="{{ snmptt.ini }}" regexp='syslog_enable = .*$' replace="syslog_enable = 0" backup=yes
   notify:
     - restart snmptt
 
 # 日付フォーマットを指定
 - name: "edit date_time_format of {{ snmptt.ini }}"
-  replace: dest="{{ snmptt.ini }}" regexp='.*date_time_format =.*$' replace="date_time_format = %H:%M:%S %Y/%m/%d" backup=yes
+  replace: path="{{ snmptt.ini }}" regexp='.*date_time_format =.*$' replace="date_time_format = %H:%M:%S %Y/%m/%d" backup=yes
   notify:
     - restart snmptt
 
@@ -98,7 +100,7 @@
 
 - name: "add a block to {{ zabbix.conf }} if it does not exist"
   blockinfile:
-    dest: "{{ zabbix.conf }}"
+    path: "{{ zabbix.conf }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK (SNMPTT)"
     backup: yes
     block: |

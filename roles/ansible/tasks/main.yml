@@ -25,7 +25,7 @@
 #   マージポリシーを統合（marge)に変更してそれぞれの値を取得できるようにする
 - name: "add a block to {{ ansible.config }} if it does not exist"
   blockinfile:
-    dest: "{{ ansible.config }}"
+    path: "{{ ansible.config }}"
     backup: yes
     block: |
       [ssh_connection]

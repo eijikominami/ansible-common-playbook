@@ -6,10 +6,11 @@
 # mariadbの使用に必要なパッケージ
 # 既にmariadb 5.x系がインストール済みの環境の場合は、mariadb, mariadb-server, mariadb-libsをアンインストールしておく
 - name: "install the latest version of MariaDB-client, MariaDB-server"
-  yum: name={{ item }} state=latest enablerepo=mariadb
-  with_items:
-    - MariaDB-client
-    - MariaDB-server
+  yum: name={{ packages }} state=latest enablerepo=mariadb
+  vars:
+    packages:
+      - MariaDB-client
+      - MariaDB-server
 
 - name: "install the latest version of php-mysql"
   yum: name=php-mysql state=latest
@@ -33,7 +34,7 @@
 # bind-address			: Listenポートを限定
 - name: "add a block to {{ mariadb.srv_conf }} if it does not exist"
   blockinfile:
-    dest: "{{ mariadb.srv_conf }}"
+    path: "{{ mariadb.srv_conf }}"
     backup: yes
     insertafter: '\[mysqld\]'
     block: |
@@ -61,7 +62,7 @@
     - restart mariadb
 
 - name: "create systemd config file directory"
-  file: dest="{{ mariadb.ulimit_dir }}" state=directory owner=root group=root mode=0755
+  file: path="{{ mariadb.ulimit_dir }}" state=directory owner=root group=root mode=0755
 
 # mariadbのopen_files_limit値が適切ではないとToo many open filesエラーが発生する
 # mariadbのopen_files_limit値よりulimitで規定されているopen files値（通常は1024）が優先される

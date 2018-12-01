@@ -10,22 +10,18 @@
 #
 ####################################
 
-- name: "install the latest version of curl, policycoreutils, openssh-server, openssh-clients"
-  yum: name={{ item }} state=latest
-  with_items:
-    - curl
-    - policycoreutils
-    - openssh-server
-    - openssh-clients
+- name: "install the latest version of curl, policycoreutils, openssh-server, openssh-clients, deltarpm"
+  yum: name={{ packages }} state=latest
+  vars:
+    packages:
+      - curl
+      - policycoreutils
+      - openssh-server
+      - openssh-clients
+      - deltarpm
 
 - name: "start service sshd, if not running"
   service: name=sshd state=started enabled=yes
-
-- name: "download the gitlab installation script"
-  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ gitlab.url }}{{ gitlab.script }}"
-
-- name: "execute gitlab installation script"
-  command: "sh /tmp/{{ gitlab.script }}"
 
 - name: "add gitlab_gitlab-ce repository"
   yum_repository: name=gitlab_gitlab-ce description=gitlab_gitlab-ce baseurl="{{ gitlab.repo_url }}" gpgkey="{{ gitlab.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
@@ -39,37 +35,37 @@
 # external_urlと設定値の間に"="は不要
 # External URL
 - name: "edit external_url in {{ gitlab.conf }}"
-  replace: dest="{{ gitlab.conf }}" regexp='^external_url.*$' replace="external_url \"http://{{ ansible_default_ipv4.address }}/gitlab\"" backup=yes
+  replace: path="{{ gitlab.conf }}" regexp='^external_url.*$' replace="external_url \"http://{{ ansible_default_ipv4.address }}/gitlab\"" backup=yes
   notify:
     - configure and start gitlab
 
 # Email address
 - name: "edit nginx listen port in {{ gitlab.conf }}"
-  replace: dest="{{ gitlab.conf }}" regexp='.*gitlab_rails\[\'gitlab_email_from\'\].*$' replace="gitlab_rails['gitlab_email_from'] = '{{ gitlab.email_from }}'" backup=yes
+  replace: path="{{ gitlab.conf }}" regexp='.*gitlab_rails\[\'gitlab_email_from\'\].*$' replace="gitlab_rails['gitlab_email_from'] = '{{ gitlab.email_from }}'" backup=yes
   notify:
     - configure and start gitlab
 
 # Email display name
 - name: "edit nginx listen port in {{ gitlab.conf }}"
-  replace: dest="{{ gitlab.conf }}" regexp='.*gitlab_rails\[\'gitlab_email_display_name\'\].*$' replace="gitlab_rails['gitlab_email_display_name'] = '{{ gitlab.email_display_name }}'" backup=yes
+  replace: path="{{ gitlab.conf }}" regexp='.*gitlab_rails\[\'gitlab_email_display_name\'\].*$' replace="gitlab_rails['gitlab_email_display_name'] = '{{ gitlab.email_display_name }}'" backup=yes
   notify:
     - configure and start gitlab
 
 # Nginx listen port
 - name: "edit nginx listen port in {{ gitlab.conf }}"
-  replace: dest="{{ gitlab.conf }}" regexp='.*nginx\[\'listen_port\'\].*$' replace="nginx['listen_port'] = {{ gitlab.nginx_port }}" backup=yes
+  replace: path="{{ gitlab.conf }}" regexp='.*nginx\[\'listen_port\'\].*$' replace="nginx['listen_port'] = {{ gitlab.nginx_port }}" backup=yes
   notify:
     - configure and start gitlab
 
 # Nginx port
 - name: "edit nginx port in {{ gitlab.conf }}"
-  replace: dest="{{ gitlab.conf }}" regexp='.*unicorn\[\'port\'\].*$' replace="unicorn['port'] = {{ gitlab.unicorn_port }}" backup=yes
+  replace: path="{{ gitlab.conf }}" regexp='.*unicorn\[\'port\'\].*$' replace="unicorn['port'] = {{ gitlab.unicorn_port }}" backup=yes
   notify:
     - configure and start gitlab
 
 # Uncorn worker timeout
 - name: "edit uncorn worker timeiout in {{ gitlab.conf }}"
-  replace: dest="{{ gitlab.conf }}" regexp='.*unicorn\[\'worker_timeout\'\].*$' replace="unicorn['worker_timeout'] = {{ gitlab.unicorn_worker_timeout }}" backup=yes
+  replace: path="{{ gitlab.conf }}" regexp='.*unicorn\[\'worker_timeout\'\].*$' replace="unicorn['worker_timeout'] = {{ gitlab.unicorn_worker_timeout }}" backup=yes
   notify:
     - configure and start gitlab
 
@@ -81,7 +77,7 @@
 
 - name: "add a block to {{ httpd.conf }} if it does not exist"
   blockinfile:
-    dest: "{{ httpd.conf }}"
+    path: "{{ httpd.conf }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK (GITLAB)"
     backup: yes
     block: |

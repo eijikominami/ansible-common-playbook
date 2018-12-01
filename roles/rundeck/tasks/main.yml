@@ -18,18 +18,18 @@
   yum: name=rundeck state=latest enablerepo=rundeck
 
 - name: "edit grails.serverURL in {{ rundeck.conf }}"
-  replace: dest="{{ rundeck.conf }}" regexp='grails.serverURL=.*$' replace="grails.serverURL=http://{{ ansible_default_ipv4.address }}/rundeck" backup=yes
+  replace: path="{{ rundeck.conf }}" regexp='grails.serverURL=.*$' replace="grails.serverURL=http://{{ ansible_default_ipv4.address }}/rundeck" backup=yes
   notify:
     - restart rundeckd
   
 - name: "edit framework.server.url in {{ rundeck.framework_conf }}"
-  replace: dest="{{ rundeck.framework_conf }}" regexp='framework.server.url = .*$' replace="framework.server.url = http://{{ ansible_default_ipv4.address }}/rundeck" backup=yes
+  replace: path="{{ rundeck.framework_conf }}" regexp='framework.server.url = .*$' replace="framework.server.url = http://{{ ansible_default_ipv4.address }}/rundeck" backup=yes
   notify:
     - restart rundeckd
 
 - name: "edit RDECK_JVM in {{ rundeck.profile }}"
   lineinfile:
-    dest: "{{ rundeck.profile }}"
+    path: "{{ rundeck.profile }}"
     backup: yes
     insertafter: 'RDECK_JVM="-Djava.security.auth.login.config.*$'
     line: "           -Dserver.web.context=/rundeck \\"
@@ -42,7 +42,7 @@
 
 - name: "add a block to {{ httpd.conf }} if it does not exist"
   blockinfile:
-    dest: "{{ httpd.conf }}"
+    path: "{{ httpd.conf }}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK (RUNDECK)"
     backup: yes
     block: |

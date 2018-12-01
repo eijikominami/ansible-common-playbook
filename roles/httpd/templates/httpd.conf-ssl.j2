@@ -363,6 +363,8 @@ LogLevel info
     # 'Proxy' request header is undefined by the IETF, not listed by IANA
     #
     RequestHeader unset Proxy early
+    Header set Access-Control-Allow-Headers "Content-Type"
+    Header set Access-Control-Allow-Origin {{ httpd.cros }}
     
     # Removing header of X-Powered-By
     Header unset X-Powered-By
