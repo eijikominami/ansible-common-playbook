@@ -104,7 +104,7 @@
 
 - name: "debug version number of PHP"
   debug: var=php_version.stdout_lines
-  when: php_version is success
+  when: php_version is succeeded
 
 - name: "show all loaded modules of PHP"
   command: /usr/local/bin/php -m
@@ -113,5 +113,5 @@
 
 - name: "debug all loaded modules of PHP"
   debug: var=php_module.stdout_lines
-  when: php_module is success
+  when: php_module is succeeded
 

@@ -11,6 +11,11 @@
 
 - name: "add epel repository"
   yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
+  when: ansible_architecture is not match("^arm")
+
+- name: "add epel repository"
+  yum_repository: name=epel description=epel baseurl="{{ epel_repo_arm }}" gpgcheck=no enabled=no
+  when: ansible_architecture is match("^arm")
 
 # SNMPTTのインストールに必要なパッケージ
 - name: "install the latest version of net-snmp-utils, net-snmp-perl, perl-Sys-Syslog, perl(SNMP), perl(XML::Simple)"

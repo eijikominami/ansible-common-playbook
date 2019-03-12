@@ -18,6 +18,7 @@
       - net-snmp
       - net-snmp-devel
       - libcurl-devel
+      - libevent-devel
 
 - name: "show version of zabbix"
   command: "/usr/local/sbin/zabbix_server -V"
@@ -27,14 +28,14 @@
 
 - name: "debug version of zabbix"
   debug: var=zabbix_current_version.stdout_lines
-  when: zabbix_current_version is success
+  when: zabbix_current_version is succeeded
 
 - name: "delete the Zabbix source files"
   file: path=/usr/local/src/zabbix-{{ zabbix.version }} state=absent
 
 - name: "get current unixtime"
   debug: var=ansible_date_time
-  when: ansible_date_time | succeeded
+  when: ansible_date_time is succeeded
 
 # Raspberry Piはarmv7(armhfp)アーキテクチャ
 # パッケージはx86_64のみなのでソースからコンパイルする
@@ -79,7 +80,8 @@
       mysql_db: name="{{ zabbix.mariadb_name }}" state=import target="/usr/local/src/zabbix-{{ zabbix.version }}/database/mysql/images.sql"
     - name: "restore database data"
       mysql_db: name="{{ zabbix.mariadb_name }}" state=import target="/usr/local/src/zabbix-{{ zabbix.version }}/database/mysql/data.sql"
-  when: (zabbix_current_version | failed) or (zabbix.version not in zabbix_current_version.stdout_lines[0])
+  when: zabbix_current_version is failed
+#  when: (zabbix_current_version is failed) or (zabbix.version not in zabbix_current_version.stdout_lines[0])
 
 # Zabbixユーザを作成
 - name: "add the user '{{ zabbix.user }}'"

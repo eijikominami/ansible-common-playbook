@@ -238,7 +238,7 @@
 
 - name: "debug version number of Apache"
   debug: var=httpd_version.stdout_lines
-  when: httpd_version is success
+  when: httpd_version is succeeded
 
 - name: "show all loaded modules of Apache"
   command: "{{ httpd.ctlbin }} -M"
@@ -247,7 +247,7 @@
 
 - name: "debug all loaded modules of Apache"
   debug: var=httpd_module.stdout_lines
-  when: httpd_module is success
+  when: httpd_module is succeeded
 
 - name: "show full status of Apache"
   command: "{{ httpd.ctlbin }} fullstatus"
@@ -256,5 +256,5 @@
 
 - name: "debug full status of Apache"
   debug: var=httpd_fullstatus.stdout_lines
-  when: httpd_fullstatus is success
+  when: httpd_fullstatus is succeeded
   

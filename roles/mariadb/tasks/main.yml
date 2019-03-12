@@ -2,6 +2,11 @@
 
 - name: "add mariadb repository"
   yum_repository: name=mariadb description=mariadb baseurl="{{ mariadb.repo_url }}" gpgkey="{{ mariadb.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
+  when: ansible_architecture is not match("^arm")
+
+- name: "add mariadb repository"
+  yum_repository: name=mariadb description=mariadb baseurl="{{ mariadb.repo_url_arm }}" gpgkey="{{ mariadb.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
+  when: ansible_architecture is match("^arm")
 
 # mariadbの使用に必要なパッケージ
 # 既にmariadb 5.x系がインストール済みの環境の場合は、mariadb, mariadb-server, mariadb-libsをアンインストールしておく
@@ -9,8 +14,8 @@
   yum: name={{ packages }} state=latest enablerepo=mariadb
   vars:
     packages:
-      - MariaDB-client
-      - MariaDB-server
+      - mariadb
+      - mariadb-server
 
 - name: "install the latest version of php-mysql"
   yum: name=php-mysql state=latest
@@ -86,4 +91,4 @@
 
 - name: "debug full status of mariadb"
   debug: var=mariadb_status.stdout_lines
-  when: mariadb_status is success
+  when: mariadb_status is succeeded

@@ -33,4 +33,4 @@
 
 - name: "debug full status of mysqld"
   debug: var=mysql_status.stdout_lines
-  when: mysql_status | succeeded
+  when: mysql_status is succeeded
