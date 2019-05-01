@@ -10,4 +10,4 @@ php:
   mysql_enabled: false
   memory_limit: 16M
 httpd:
-  compiled: true
+  compile_from_src: true

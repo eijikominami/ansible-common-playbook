@@ -4,5 +4,7 @@ fluentd:
   init: /etc/init.d/td-agent
   systemd: /lib/systemd/system/td-agent.service
   logrotate: /etc/logrotate.d/td-agent
-  source_url: http://toolbelt.treasuredata.com/sh/install-redhat-td-agent3.sh
-  source_sh: install-redhat-td-agent3.sh
+  source_url_rhel7 : http://toolbelt.treasuredata.com/sh/install-redhat-td-agent3.sh
+  source_url_amzn2: https://toolbelt.treasuredata.com/sh/install-amazon2-td-agent3.sh 
+  source_sh_rhel7: install-redhat-td-agent3.sh
+  source_sh_amzn2: install-amazon2-td-agent3.sh 

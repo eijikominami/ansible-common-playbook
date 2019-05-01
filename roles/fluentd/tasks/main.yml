@@ -1,16 +1,31 @@
 # /common_playbook/roles/fluentd/tasks
 
-- name: "download the fluentd installation script"
-  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ fluentd.source_url }}"
+- name: "download the fluentd installation script for rhel7"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ fluentd.source_url_rhel7 }}"
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+- name: "download the fluentd installation script for amzn2"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ fluentd.source_url_amzn2 }}"
+  when: ansible_distribution == "Amazon" and ansible_distribution_major_version == "7"
 
 # sudoは環境変数を引き継いでくれない。
 # sudoをsudo -Eに書き換えて環境変数を引き継ぐ。
 
-- name: "add sudo '-E' option in {{ fluentd.source_sh }}"
-  replace: path="/tmp/{{ fluentd.source_sh }}" regexp='^sudo sh' replace="sudo -E sh" backup=yes
+- name: "add sudo '-E' option in {{ fluentd.source_sh_rhel7 }}"
+  replace: path="/tmp/{{ fluentd.source_sh_rhel7 }}" regexp='^sudo sh' replace="sudo -E sh" backup=yes
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+- name: "add sudo '-E' option in {{ fluentd.source_sh_amzn2 }}"
+  replace: path="/tmp/{{ fluentd.source_sh_amzn2 }}" regexp='^sudo sh' replace="sudo -E sh" backup=yes
+  when: ansible_distribution == "Amazon" and ansible_distribution_major_version == "7"
 
 - name: "execute fluentd installation script"
-  command: "sh /tmp/{{ fluentd.source_sh }}"
+  command: "sh /tmp/{{ fluentd.source_sh_rhel7 }}"
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+- name: "execute fluentd installation script"
+  command: "sh /tmp/{{ fluentd.source_sh_amzn2 }}"
+  when: ansible_distribution == "Amazon" and ansible_distribution_major_version == "7"
 
 - name: "install the latest version of gcc, libcurl-devel"
   yum: name={{ packages }} state=latest

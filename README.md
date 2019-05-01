@@ -16,7 +16,7 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | ---- | ---- | ---- | ---- |
 | **drdb.partition** | array | 同期させるパーティションの情報 | 指定なし |
 
-## Elasticsearch
+## elasticsearch
 - Elasticsearchをインストールします。
 - プロジェクトごとに以下の値の設定が必要です。
 
@@ -199,8 +199,8 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | php.mysql_enabled | Bool | MySQL(MariaDB)利用の可否 | false |
 | php.memory_limit | String | スクリプトが確保できる最大メモリ | 16M |
 | httpd.conf | String | httpd.confのフルパス | 指定なし |
-| httpd.compiled | Bool | Apacheをソースコードから入れたか否か | true |  
-| **httpd.ctlbin** | String | Apache実行ファイルのフルパス (httpd.compiled=trueのときのみ) | 指定なし |
+| httpd.compile_from_src | Bool | Apacheをソースコードから入れたか否か | true |  
+| **httpd.ctlbin** | String | Apache実行ファイルのフルパス (httpd.compile_from_src=trueのときのみ) | 指定なし |
 | **mariadb.sock** | String | MariaDB Sockファイルのフルパス (php.mysql_enabled=trueのときのみ) | 指定なし |
 
 ### モジュール
@@ -267,6 +267,9 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 ## setup
 - OSインストール直後に行う必要のある、基本パッケージのインストール、およびセキュリティ設定をします。
+
+## sphinx
+- Sphinxをインストールします。
 
 ## snmptt
 - SNMPTTをインストールします。

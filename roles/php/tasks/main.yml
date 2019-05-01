@@ -8,9 +8,9 @@
 # {{php.mysql_enabled}}
 # {{php.memory_limit}}
 # {{httpd.conf}}
-# {{httpd.compiled}}
+# {{httpd.compile_from_src}}
 #
-# {{httpd.compiled}} が true のときは以下の値も指定すること
+# {{httpd.compile_from_src}} が true のときは以下の値も指定すること
 # {{httpd.ctlbin}}
 #
 # {{php.mysql_enabled}} が true のときは以下の値も指定すること
@@ -91,11 +91,11 @@
 
 - name: "restart service apachectl"
   command: "{{ httpd.ctlbin }} graceful"
-  when: httpd.compiled
+  when: httpd.compile_from_src
 
 - name: "restart service httpd"
   service: name=httpd state=restarted
-  when: not httpd.compiled
+  when: not httpd.compile_from_src
 
 - name: "show version number of PHP"
   command: /usr/local/bin/php -v
