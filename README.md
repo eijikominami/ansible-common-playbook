@@ -43,6 +43,9 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | gitlab.email_from | String | 送信メール元アドレス | example@example.com |
 | gitlab.email_display_name | String | 送信メール名 | Example |
 
+## greengrass
+- AWS Greengrassをインストールします。
+
 ## httpd
 - Apacheをインストールします。
 - プロジェクトごとに以下の値の設定が必要です。
