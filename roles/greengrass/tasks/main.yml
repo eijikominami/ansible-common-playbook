@@ -1,0 +1,33 @@
+# /common_playbook/roles/greengrass/tasks
+
+- name: "add the user '{{ greengrass.user }}'"
+  user: name={{ greengrass.user }} system=yes
+
+- name: "add the group '{{ greengrass.group }}'"
+  group: name={{ greengrass.group }} system=yes
+
+- name: "add cgroup options in {{ greengrass.cmdline }}"
+  replace: path={{ greengrass.cmdline }} regexp='rootwait$' replace="rootwait cgroup_enable=memory cgroup_memory=1" backup=yes
+
+- name: "add a {{ greengrass.configs_modules }} if it does not exist"
+  copy: src=configs.module dest={{ greengrass.configs_modules }} owner=root group=root mode=0700
+
+- name: "add the configs module"
+  modprobe: name=configs state=present
+
+- name: "download the greengrass-dependency-checker"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ greengrass.greengrass_dependency_checker_url }}"
+
+- name: "unpacks the greengrass-dependency-checker"
+  unarchive: remote_src=yes src=greengrass-dependency-checker-GGCv{{ greengrass.ggc_version }}.zip dest=/usr/local/src
+
+- name: "run the greengrass-dependency-checker"
+  command: "./check_ggc_dependencies"
+  args:
+   chdir: "/usr/local/src/greengrass-dependency-checker-GGCv{{ greengrass.ggc_version }}"
+  register: ggc_status
+  changed_when: false
+
+- name: "debug status of greengrass-dependency-checker"
+  debug: var=ggc_status.stdout_lines
+  when: ggc_status is succeeded

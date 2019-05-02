@@ -1,0 +1,9 @@
+# /common_playbook/roles/greengrass/defaults
+
+greengrass:
+  user: ggc_user
+  group: ggc_group
+  cmdline: /boot/cmdline.txt
+  configs_modules: /etc/sysconfig/modules/configs.module
+  ggc_version: 1.9.0
+  greengrass_dependency_checker_url: https://github.com/aws-samples/aws-greengrass-samples/raw/master/greengrass-dependency-checker-GGCv1.8.0.zip
