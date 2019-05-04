@@ -19,12 +19,12 @@
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ greengrass.greengrass_dependency_checker_url }}"
 
 - name: "unpacks the greengrass-dependency-checker"
-  unarchive: remote_src=yes src=greengrass-dependency-checker-GGCv{{ greengrass.ggc_version }}.zip dest=/usr/local/src
+  unarchive: remote_src=yes src=/tmp/greengrass-dependency-checker-GGCv{{ greengrass.ggc_version }}.zip dest=/usr/local/src
 
 - name: "run the greengrass-dependency-checker"
   command: "./check_ggc_dependencies"
   args:
-   chdir: "/usr/local/src/greengrass-dependency-checker-GGCv{{ greengrass.ggc_version }}"
+   chdir: "/usr/local/src"
   register: ggc_status
   changed_when: false
 
