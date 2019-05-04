@@ -2,7 +2,10 @@
 
 # ATTENTION ########################
 # 以下の値は、各プロジェクトごとに指定すること
-# 
+#
+# {{ version.httpd }}
+# {{ version.apr }}
+# {{ version.apr_util }}
 # {{ httpd.server_admin }}
 # {{ httpd.ssl_enabled }}
 # {{ httpd.pass }}
@@ -37,22 +40,22 @@
 - name: "delete the Apache source files"
   file: path=/usr/local/src/httpd-{{ version.httpd }} state=absent
 
-- name: "download the Apache source files"
+- name: "download Apache source files"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ httpd.source_url }}"
 
-- name: "download the APR source files"
+- name: "download APR source files"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ apr.source_url }}"
 
-- name: "download the APR Util source files"
+- name: "download APR Util source files"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ apr_util.source_url }}"
 
-- name: "unpacks the Apache source files"
+- name: "unpack Apache source files"
   unarchive: remote_src=yes src=/tmp/httpd-{{ version.httpd }}.tar.gz dest=/usr/local/src
 
-- name: "unpacks the APR source files"
+- name: "unpack APR source files"
   unarchive: remote_src=yes src=/tmp/apr-{{ version.apr }}.tar.gz dest=/usr/local/src/httpd-{{ version.apr }}/srclib/
 
-- name: "unpacks the APR Util source files"
+- name: "unpack APR Util source files"
   unarchive: remote_src=yes src=/tmp/apr-util-{{ version.apr_util }}.tar.gz dest=/usr/local/src/httpd-{{ version.httpd }}/srclib/
 
 - name: "move apr-{{ version.apr }} to apr"
@@ -76,18 +79,18 @@
 # --disable-version					: turn off server signature
 # --disable-filter					: disable the filter module
 
-- name: "configure the Apache programs (SSL enabled)"
+- name: "configure Apache programs (SSL enabled)"
   command: chdir=/usr/local/src/httpd-{{ version.httpd }} ./configure --enable-mpms-shared=all --enable-auth_digest=static --enable-so --enable-ssl --with-ssl={{ ssl.dir }} --disable-autoindex --disable-version --disable-filter  
   when: httpd.ssl_enabled
 
-- name: "configure the Apache programs (SSL disabled)"
+- name: "configure Apache programs (SSL disabled)"
   command: chdir=/usr/local/src/httpd-{{ version.httpd }} ./configure --enable-mpms-shared=all --enable-auth_digest=static --enable-so --disable-autoindex --disable-version --disable-filter  
   when: not httpd.ssl_enabled
 
-- name: "make the Apache programs"
+- name: "make Apache programs"
   make: chdir=/usr/local/src/httpd-{{ version.httpd }}
 
-- name: "install the Apache programs"
+- name: "install Apache programs"
   make: chdir=/usr/local/src/httpd-{{ version.httpd }} target=install
 
 - name: "create apache log file directory"

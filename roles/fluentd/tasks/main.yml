@@ -1,10 +1,10 @@
 # /common_playbook/roles/fluentd/tasks
 
-- name: "download the fluentd installation script for rhel7"
+- name: "download a fluentd installation script for rhel7"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ fluentd.source_url_rhel7 }}"
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
 
-- name: "download the fluentd installation script for amzn2"
+- name: "download a fluentd installation script for amzn2"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ fluentd.source_url_amzn2 }}"
   when: ansible_distribution == "Amazon" and ansible_distribution_major_version == "7"
 

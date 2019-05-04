@@ -3,24 +3,25 @@
 # ATTENTION ########################
 # 以下の値は、各プロジェクトごとに指定すること
 # 
+# {{ version.fping }}
 # {{ zabbix.conf }}
 #
 ####################################
 
 # Zabbixは導通チェックにfpingを使用
-- name: "download the fping source files"
+- name: "download fping source files"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ fping.source_url }}"
 
-- name: "unpacks the fping source files"
+- name: "unpack fping source files"
   unarchive: remote_src=yes src=/tmp/fping-{{ version.fping }}.tar.gz dest=/usr/local/src
 
-- name: "configure the fping programs"
+- name: "configure fping programs"
   command: chdir=/usr/local/src/fping-{{ version.fping }} ./configure
 
-- name: "make the fping programs"
+- name: "make fping programs"
   make: chdir=/usr/local/src/fping-{{ version.fping }}
 
-- name: "install the fping programs"
+- name: "install fping programs"
   make: chdir=/usr/local/src/fping-{{ version.fping }} target=install
 
 # ソースコンパイル時は実行ファイルのパスが通常と異なる

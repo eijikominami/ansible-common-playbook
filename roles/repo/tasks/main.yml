@@ -29,7 +29,7 @@
 - name: "put {{ centos_repo.sync_sh }}"
   template: src=reposync.sh.j2 dest="{{ centos_repo.sync_sh }}"
 
-- name: "add mode the {{ centos_repo.sync_sh }} file executable"
+- name: "add mode {{ centos_repo.sync_sh }} file executable"
   file: path={{ centos_repo.sync_sh }} mode="ugo+x"
 
 - name: "add crontab to execute {{ centos_repo.sync_sh }}"

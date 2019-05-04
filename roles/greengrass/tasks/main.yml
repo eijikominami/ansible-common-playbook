@@ -1,5 +1,12 @@
 # /common_playbook/roles/greengrass/tasks
 
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ version.greengrass }}
+#
+####################################
+
 - name: "add the user '{{ greengrass.user }}'"
   user: name={{ greengrass.user }} system=yes
 
@@ -12,16 +19,16 @@
 - name: "add a {{ greengrass.configs_modules }} if it does not exist"
   copy: src=configs.module dest={{ greengrass.configs_modules }} owner=root group=root mode=0700
 
-- name: "add the configs module"
+- name: "add configs module"
   modprobe: name=configs state=present
 
-- name: "download the greengrass-dependency-checker"
+- name: "download a greengrass-dependency-checker"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ greengrass.greengrass_dependency_checker_url }}"
 
-- name: "unpacks the greengrass-dependency-checker"
+- name: "unpack a greengrass-dependency-checker"
   unarchive: remote_src=yes src=/tmp/greengrass-dependency-checker-GGCv{{ version.greengrass }}.zip dest=/usr/local/src
 
-- name: "run the greengrass-dependency-checker"
+- name: "run a greengrass-dependency-checker"
   command: "./check_ggc_dependencies"
   args:
    chdir: "/usr/local/src"

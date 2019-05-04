@@ -1,5 +1,12 @@
 # /common_playbook/roles/openssl/tasks
 
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ version.ssl }}
+#
+####################################
+
 # コンパイルに必要なパッケージをインストール
 - name: "install the latest version of gcc, zlib-devel"
   yum: name={{ packages }} state=latest
@@ -8,13 +15,13 @@
       - gcc
       - zlib-devel
 
-- name: "delete the openssl source files"
+- name: "delete existing openssl source files"
   file: path=/usr/local/src/openssl-{{ version.ssl }} state=absent
 
-- name: "download the openssl source files"
+- name: "download openssl source files"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ ssl.source_url }}"
 
-- name: "unpacks the openssl source files"
+- name: "unpack openssl source files"
   unarchive: remote_src=yes src=/tmp/openssl-{{ version.ssl }}.tar.gz dest=/usr/local/src
 
 # openssl configure options
@@ -22,13 +29,13 @@
 # shared          	: In addition to the usual static libraries, create shared shared libraries" below.
 # zlib				: Build with support for zlib compression/decompression.
 
-- name: "configure the openssl programs"
+- name: "configure openssl programs"
   command: chdir=/usr/local/src/openssl-{{ version.ssl }} ./config shared zlib
 
-- name: "make the openssl programs"
+- name: "make openssl programs"
   command: make chdir=/usr/local/src/openssl-{{ version.ssl }}
 
-- name: "install the openssl programs"
+- name: "install openssl programs"
   command: make install chdir=/usr/local/src/openssl-{{ version.ssl }}
 
 # 共通ライブラリにSSLライブラリのパスを追加する

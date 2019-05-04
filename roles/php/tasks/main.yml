@@ -3,44 +3,45 @@
 # ATTENTION ########################
 # 以下の値は、各プロジェクトごとに指定すること
 # 
-# {{php.configure_options}}
-# {{php.file_uploads_disabled}}
-# {{php.mysql_enabled}}
-# {{php.memory_limit}}
-# {{httpd.conf}}
-# {{httpd.compile_from_src}}
+# {{ version.php }}
+# {{ php.configure_options }}
+# {{ php.file_uploads_disabled }}
+# {{ php.mysql_enabled }}
+# {{ php.memory_limit }}
+# {{ httpd.conf }}
+# {{ httpd.compile_from_src }}
 #
-# {{httpd.compile_from_src}} が true のときは以下の値も指定すること
-# {{httpd.ctlbin}}
+# {{ httpd.compile_from_src }} が true のときは以下の値も指定すること
+# {{ httpd.ctlbin }}
 #
-# {{php.mysql_enabled}} が true のときは以下の値も指定すること
-# {{mariadb.sock}}
+# {{ php.mysql_enabled }} が true のときは以下の値も指定すること
+# {{ mariadb.sock }}
 #
 ####################################
 
-- name: "remove the PHP package"
+- name: "remove PHP packages"
   yum: name={{ packages }} state=absent
   vars:
     packages:
       - php
       - php-*
 
-- name: "delete the PHP source files"
+- name: "delete existing PHP source files"
   file: path=/usr/local/src/php-{{ version.php }} state=absent
 
-- name: "download the PHP source files"
+- name: "download PHP source files"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ php.source_url }}"
 
-- name: "unpacks the PHP source files"
+- name: "unpack PHP source files"
   unarchive: remote_src=yes src=/tmp/php-{{ version.php }}.tar.gz dest=/usr/local/src
 
-- name: "configure the PHP programs"
+- name: "configure PHP programs"
   command: "chdir=/usr/local/src/php-{{ version.php }} ./configure {{ php.configure_options }}"
 
-- name: "make the PHP programs"
+- name: "make PHP programs"
   make: chdir=/usr/local/src/php-{{ version.php }}
 
-- name: "install the PHP programs"
+- name: "install PHP programs"
   make: chdir=/usr/local/src/php-{{ version.php }} target=install
 
 - name: "copy php.ini file"

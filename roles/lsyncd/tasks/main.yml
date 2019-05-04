@@ -21,22 +21,22 @@
       - gcc
       - logrotate
 
-- name: "delete the lsyncd source files"
+- name: "delete existing lsyncd source files"
   file: path=/usr/local/src/lsyncd-master state=absent
 
-- name: "download the lsyncd source files"
+- name: "download lsyncd source files"
   get_url: dest=/tmp force=yes timeout={{  get_url_timeout  }} url="{{ lsyncd.source_url }}"
 
-- name: "unpacks the lsyncd source files"
+- name: "unpack lsyncd source files"
   unarchive: remote_src=yes src=/tmp/lsyncd-master.zip dest=/usr/local/src
 
-- name: "cmake the lsync programs"
+- name: "cmake lsync programs"
   command: cmake . chdir=/usr/local/src/lsyncd-master
 
-- name: "make the lsync programs"
+- name: "make lsync programs"
   make: chdir=/usr/local/src/lsyncd-master
 
-- name: "install the lsync programs"
+- name: "install lsync programs"
   make: chdir=/usr/local/src/lsyncd-master target=install
 
 - name: "create lsyncd config file if it does not exist"

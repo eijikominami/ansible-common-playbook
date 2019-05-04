@@ -1,5 +1,12 @@
 # /common_playbook/roles/sox/tasks
 
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ version.sox }}
+#
+####################################
+
 - name: "add epel repository"
   yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
   when: ansible_architecture is not match("^arm")
@@ -19,17 +26,17 @@
       - flac-devel
       - libvorbis-devel
 
-- name: "download the sox source files"
+- name: "download sox source files"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ sox.source_url }}"
 
-- name: "unpacks the sox source files"
+- name: "unpack sox source files"
   unarchive: remote_src=yes src=/tmp/sox-{{ version.sox }}.tar.gz dest=/usr/local/src
 
-- name: "configure the sox programs"
+- name: "configure sox programs"
   command: chdir=/usr/local/src/sox-{{ version.sox }} ./configure
 
-- name: "make the sox programs"
+- name: "make sox programs"
   command: make -s chdir=/usr/local/src/sox-{{ version.sox }}
 
-- name: "install the sox programs"
+- name: "install sox programs"
   command: make install chdir=/usr/local/src/sox-{{ version.sox }}

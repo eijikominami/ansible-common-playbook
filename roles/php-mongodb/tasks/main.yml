@@ -20,22 +20,22 @@
 - name: "install the latest version of re2c"
   yum: name=re2c state=latest enablerepo=epel
 
-- name: "delete the mongodb library source files"
+- name: "delete existing mongodb library source files"
   file: path="{{ php_mongo.basedir }}" state=absent
 
-- name: "git checkout the mongodb library source files"
+- name: "git checkout mongodb library source files"
   git: dest="{{ php_mongo.basedir }}" repo="{{ php_mongo.repo }}"
 
-- name: "phpize the mongodb library"
+- name: "phpize mongodb library"
   command: "chdir={{ php_mongo.basedir }} {{ php.phpize }}"
 
-- name: "configure the mongodb library"
+- name: "configure mongodb library"
   command: "chdir={{ php_mongo.basedir }} ./configure --with-php-config={{ php.php_config }}"
 
-- name: "make the mongodb library"
+- name: "make mongodb library"
   make: "chdir={{ php_mongo.basedir }}"
 
-- name: "install the mongodb library"
+- name: "install mongodb library"
   make: "chdir={{ php_mongo.basedir }} target=install"
   
 - name: "copy mongodb.so library to {{ php.extensiondir }}"

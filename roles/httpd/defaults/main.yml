@@ -5,7 +5,7 @@ version:
   apr: 1.7.0
   apr_util: 1.6.1
 httpd:
-  source_url: http://ftp.jaist.ac.jp/pub/apache/httpd/httpd-{{ version }}.tar.gz
+  source_url: http://ftp.jaist.ac.jp/pub/apache/httpd/httpd-{{ version.httpd }}.tar.gz
   user: apache
   base_dir: /usr/local/apache2
   doc_root: /usr/local/apache2/htdocs

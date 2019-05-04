@@ -3,6 +3,7 @@
 # ATTENTION ########################
 # 以下の値は、各プロジェクトごとに指定すること
 # 
+# {{ version.zabbix }}
 # {{ zabbix.start_pollers }}
 # {{ zabbix.start_db_syncers }}
 # {{ zabbix.cache_size }}
@@ -30,7 +31,7 @@
   debug: var=zabbix_current_version.stdout_lines
   when: zabbix_current_version is succeeded
 
-- name: "delete the Zabbix source files"
+- name: "delete existing zabbix source files"
   file: path=/usr/local/src/zabbix-{{ version.zabbix }} state=absent
 
 - name: "get current unixtime"
@@ -39,16 +40,16 @@
 
 # Raspberry Piはarmv7(armhfp)アーキテクチャ
 # パッケージはx86_64のみなのでソースからコンパイルする
-- name: "download the Zabbix source files"
+- name: "download Zabbix source files"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} validate_certs=no url="{{ zabbix.source_url }}&ts={{ ansible_date_time.epoch }}"
 
-- name: "unpacks the Zabbix source files"
+- name: "unpack Zabbix source files"
   unarchive: remote_src=yes src=/tmp/zabbix-{{ version.zabbix }}.tar.gz dest=/usr/local/src
 
-- name: "configure the Zabbix programs"
+- name: "configure zabbix programs"
   command: chdir=/usr/local/src/zabbix-{{ version.zabbix }} ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
 
-- name: "install the Zabbix programs"
+- name: "install zabbix programs"
   make: chdir=/usr/local/src/zabbix-{{version.zabbix }} target=install
 
 # OS起動時にZabbixユーザでZabbixを実行
@@ -70,7 +71,7 @@
 
 # 既存データがある状態でデータインポートするとエラーが発生するので一度削除する
 - block:
-    - name: "delete the existing database with name '{{ zabbix.mariadb_name }}'"
+    - name: "delete existing database with name '{{ zabbix.mariadb_name }}'"
       mysql_db: name="{{ zabbix.mariadb_name }}" state=absent
     - name: "create a new database with name '{{zabbix.mariadb_name}}'"
       mysql_db: name="{{ zabbix.mariadb_name }}" state=present

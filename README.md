@@ -31,6 +31,7 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
+| **version.fping** | String | fpingのバージョン名 | defaultsに指定の値 |
 | **zabbix.conf** | String | zabbix.confのフルパス | 指定なし |
 
 ## gitlab
@@ -45,6 +46,11 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 ## greengrass
 - AWS Greengrassをインストールします。
+- プロジェクトごとに以下の値の設定が必要です。
+
+| 変数名 | 型 | 内容 | デフォルト値 |
+| ---- | ---- | ---- | ---- |
+| **version.greengrass** | String | greengrassのバージョン名 | defaultsに指定の値 |
 
 ## httpd
 - Apacheをインストールします。
@@ -52,6 +58,9 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
+| **version.httpd** | String | httpdのバージョン名 | defaultsに指定の値 |
+| **version.apr** | String |aprのバージョン名 | defaultsに指定の値 |
+| **version.apr_util** | String | apr_utilのバージョン名 | defaultsに指定の値 |
 | httpd.server_admin | String | サーバアドミン | webmaster@apache.org |
 | httpd.ssl_enabled  | Bool | SSL対応の可否 | false |
 | httpd.pass | String | httpdユーザのログインパスワード | password |
@@ -107,7 +116,7 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 ## httpd-for-zabbix
 - Zabbix用のApacheをインストールします。
 
-## Jenkins
+## jenkins
 - Jenkinsをインストールします。
 - プロジェクトごとに以下の値の設定が必要です。
 
@@ -148,6 +157,7 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
+| **version.mariadb** | String | mariadbのバージョン名 | defaultsに指定の値 |
 | mariadb.table_open_cache | String | 開いたままにするファイル数 | 400 |
 | mariadb.query_cache_size | String | クエリ結果をキャッシュするために割り当てられたメモリーの量 | 0M |
 | mariadb.wait_timeout | String | 非インタラクティブな接続を閉じる前に、サーバーがその接続上でアクティビティーを待機する秒数 | 28800sec |
@@ -162,6 +172,11 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 ## mariadb-for-zabbix
 - Zabbix用のMariaDBをインストールします。
 - CentOS7以上で動作
+- プロジェクトごとに以下の値の設定が必要です。
+
+| 変数名 | 型 | 内容 | デフォルト値 |
+| ---- | ---- | ---- | ---- |
+| **version.mariadb** | String | mariadbのバージョン名 | defaultsに指定の値 |
 
 ## mongodb
 - MongoDBをインストールします。
@@ -172,6 +187,11 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 ## openssl
 - OpenSSLをインストールします。
 - SSLの証明書やキーを配置する場合は、/tmpに必要なファイルを事前に設置しておく必要があります。
+- プロジェクトごとに以下の値の設定が必要です。
+
+| 変数名 | 型 | 内容 | デフォルト値 |
+| ---- | ---- | ---- | ---- |
+| **version.ssl** | String | opensslのバージョン名 | defaultsに指定の値 |
 
 ## pacemaker
 - Pacemakerをインストールします。
@@ -197,6 +217,7 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
+| **version.php** | String | phpのバージョン名 | defaultsに指定の値 |
 | php.configure_options | String | PHPコンパイルオプション | --enable-mbstring --with-apxs2=/usr/bin/apxs --with-config-file-path=/etc --disable-libxml --disable-xmlwriter --disable-xmlreader --disable-simplexml --disable-xml --disable-dom --without-pear |
 | php.file_uploads_disabled | Bool | ファイルアップロードの可否 | false | 
 | php.mysql_enabled | Bool | MySQL(MariaDB)利用の可否 | false |
@@ -287,6 +308,11 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 ## sox
 - SoXをインストールします。
+- プロジェクトごとに以下の値の設定が必要です。
+
+| 変数名 | 型 | 内容 | デフォルト値 |
+| ---- | ---- | ---- | ---- |
+| **version.sox** | String | soxのバージョン名 | defaultsに指定の値 |
 
 ## vsftpd
 - vsftpdをインストールします。
@@ -298,6 +324,7 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
+| **version.zabbix** | String | zabbixのバージョン名 | defaultsに指定の値 |
 | zabbix.start_pollers | String | StartPollers | 10 |
 | zabbix.start_db_syncers | String | StartDBSyncers | 4 |
 | zabbix.cache_size | String | CacheSize | 32M |
@@ -308,4 +335,5 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
+| **version.zabbix_agent** | String | zabbix_agentのバージョン名 | defaultsに指定の値 |
 | **zabbix.server** | String | Zabbixサーバのアドレス | 指定なし |

@@ -1,5 +1,12 @@
 # /common_playbook/roles/mariadb/tasks
 
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+# 
+# {{ version.mariadb }}
+#
+####################################
+
 - name: "add mariadb repository"
   yum_repository: name=mariadb description=mariadb baseurl="{{ mariadb.repo_url }}" gpgkey="{{ mariadb.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
   when: ansible_architecture is not match("^arm")
