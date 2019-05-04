@@ -23,13 +23,13 @@
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ sox.source_url }}"
 
 - name: "unpacks the sox source files"
-  unarchive: remote_src=yes src=/tmp/sox-{{ sox.version }}.tar.gz dest=/usr/local/src
+  unarchive: remote_src=yes src=/tmp/sox-{{ version.sox }}.tar.gz dest=/usr/local/src
 
 - name: "configure the sox programs"
-  command: chdir=/usr/local/src/sox-{{ sox.version }} ./configure
+  command: chdir=/usr/local/src/sox-{{ version.sox }} ./configure
 
 - name: "make the sox programs"
-  command: make -s chdir=/usr/local/src/sox-{{ sox.version }}
+  command: make -s chdir=/usr/local/src/sox-{{ version.sox }}
 
 - name: "install the sox programs"
-  command: make install chdir=/usr/local/src/sox-{{ sox.version }}
+  command: make install chdir=/usr/local/src/sox-{{ version.sox }}

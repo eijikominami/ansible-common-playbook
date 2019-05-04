@@ -35,7 +35,7 @@
       - logrotate
 
 - name: "delete the Apache source files"
-  file: path=/usr/local/src/httpd-{{ httpd.version }} state=absent
+  file: path=/usr/local/src/httpd-{{ version.httpd }} state=absent
 
 - name: "download the Apache source files"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ httpd.source_url }}"
@@ -47,19 +47,19 @@
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ apr_util.source_url }}"
 
 - name: "unpacks the Apache source files"
-  unarchive: remote_src=yes src=/tmp/httpd-{{ httpd.version }}.tar.gz dest=/usr/local/src
+  unarchive: remote_src=yes src=/tmp/httpd-{{ version.httpd }}.tar.gz dest=/usr/local/src
 
 - name: "unpacks the APR source files"
-  unarchive: remote_src=yes src=/tmp/apr-{{ apr.version }}.tar.gz dest=/usr/local/src/httpd-{{ httpd.version }}/srclib/
+  unarchive: remote_src=yes src=/tmp/apr-{{ version.apr }}.tar.gz dest=/usr/local/src/httpd-{{ version.apr }}/srclib/
 
 - name: "unpacks the APR Util source files"
-  unarchive: remote_src=yes src=/tmp/apr-util-{{apr_util.version}}.tar.gz dest=/usr/local/src/httpd-{{ httpd.version }}/srclib/
+  unarchive: remote_src=yes src=/tmp/apr-util-{{ version.apr_util }}.tar.gz dest=/usr/local/src/httpd-{{ version.httpd }}/srclib/
 
-- name: "move apr-{{ apr.version }} to apr"
-  command: mv -f /usr/local/src/httpd-{{ httpd.version }}/srclib/apr-{{ apr.version }} /usr/local/src/httpd-{{ httpd.version }}/srclib/apr
+- name: "move apr-{{ version.apr }} to apr"
+  command: mv -f /usr/local/src/httpd-{{ version.httpd }}/srclib/apr-{{ version.apr }} /usr/local/src/httpd-{{ version.httpd }}/srclib/apr
 
-- name: "move apr-util-{{ apr_util.version }} to apr-util"
-  command: mv -f /usr/local/src/httpd-{{ httpd.version }}/srclib/apr-util-{{ apr_util.version }} /usr/local/src/httpd-{{ httpd.version }}/srclib/apr-util
+- name: "move apr-util-{{ version.apr_util }} to apr-util"
+  command: mv -f /usr/local/src/httpd-{{ version.httpd }}/srclib/apr-util-{{ version.apr_util }} /usr/local/src/httpd-{{ version.httpd }}/srclib/apr-util
 
 # apache 2.4 configure options
 # http://httpd.apache.org/docs/2.4/programs/configure.html
@@ -77,18 +77,18 @@
 # --disable-filter					: disable the filter module
 
 - name: "configure the Apache programs (SSL enabled)"
-  command: chdir=/usr/local/src/httpd-{{ httpd.version }} ./configure --enable-mpms-shared=all --enable-auth_digest=static --enable-so --enable-ssl --with-ssl={{ ssl.dir }} --disable-autoindex --disable-version --disable-filter  
+  command: chdir=/usr/local/src/httpd-{{ version.httpd }} ./configure --enable-mpms-shared=all --enable-auth_digest=static --enable-so --enable-ssl --with-ssl={{ ssl.dir }} --disable-autoindex --disable-version --disable-filter  
   when: httpd.ssl_enabled
 
 - name: "configure the Apache programs (SSL disabled)"
-  command: chdir=/usr/local/src/httpd-{{ httpd.version }} ./configure --enable-mpms-shared=all --enable-auth_digest=static --enable-so --disable-autoindex --disable-version --disable-filter  
+  command: chdir=/usr/local/src/httpd-{{ version.httpd }} ./configure --enable-mpms-shared=all --enable-auth_digest=static --enable-so --disable-autoindex --disable-version --disable-filter  
   when: not httpd.ssl_enabled
 
 - name: "make the Apache programs"
-  make: chdir=/usr/local/src/httpd-{{ httpd.version }}
+  make: chdir=/usr/local/src/httpd-{{ version.httpd }}
 
 - name: "install the Apache programs"
-  make: chdir=/usr/local/src/httpd-{{ httpd.version }} target=install
+  make: chdir=/usr/local/src/httpd-{{ version.httpd }} target=install
 
 - name: "create apache log file directory"
   file: path="{{ httpd.log }}" state=directory owner=root group=root mode=0755

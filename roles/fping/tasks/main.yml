@@ -12,16 +12,16 @@
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ fping.source_url }}"
 
 - name: "unpacks the fping source files"
-  unarchive: remote_src=yes src=/tmp/fping-{{ fping.version }}.tar.gz dest=/usr/local/src
+  unarchive: remote_src=yes src=/tmp/fping-{{ version.fping }}.tar.gz dest=/usr/local/src
 
 - name: "configure the fping programs"
-  command: chdir=/usr/local/src/fping-{{ fping.version }} ./configure
+  command: chdir=/usr/local/src/fping-{{ version.fping }} ./configure
 
 - name: "make the fping programs"
-  make: chdir=/usr/local/src/fping-{{ fping.version }}
+  make: chdir=/usr/local/src/fping-{{ version.fping }}
 
 - name: "install the fping programs"
-  make: chdir=/usr/local/src/fping-{{ fping.version }} target=install
+  make: chdir=/usr/local/src/fping-{{ version.fping }} target=install
 
 # ソースコンパイル時は実行ファイルのパスが通常と異なる
 - name: "add fping location in {{ zabbix.conf }}"

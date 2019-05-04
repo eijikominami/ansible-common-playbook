@@ -26,25 +26,25 @@
       - php-*
 
 - name: "delete the PHP source files"
-  file: path=/usr/local/src/php-{{ php.version }} state=absent
+  file: path=/usr/local/src/php-{{ version.php }} state=absent
 
 - name: "download the PHP source files"
   get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ php.source_url }}"
 
 - name: "unpacks the PHP source files"
-  unarchive: remote_src=yes src=/tmp/php-{{ php.version }}.tar.gz dest=/usr/local/src
+  unarchive: remote_src=yes src=/tmp/php-{{ version.php }}.tar.gz dest=/usr/local/src
 
 - name: "configure the PHP programs"
-  command: "chdir=/usr/local/src/php-{{ php.version }} ./configure {{ php.configure_options }}"
+  command: "chdir=/usr/local/src/php-{{ version.php }} ./configure {{ php.configure_options }}"
 
 - name: "make the PHP programs"
-  make: chdir=/usr/local/src/php-{{ php.version }}
+  make: chdir=/usr/local/src/php-{{ version.php }}
 
 - name: "install the PHP programs"
-  make: chdir=/usr/local/src/php-{{ php.version }} target=install
+  make: chdir=/usr/local/src/php-{{ version.php }} target=install
 
 - name: "copy php.ini file"
-  copy: remote_src=yes src="/usr/local/src/php-{{ php.version }}/php.ini-production" dest="{{ php.ini }}" mode=0644 
+  copy: remote_src=yes src="/usr/local/src/php-{{ version.php }}/php.ini-production" dest="{{ php.ini }}" mode=0644 
 
 # タイムゾーンと文字コードを指定  
 - name: "add a block to {{ php.ini }} if it does not exist"

@@ -16,6 +16,6 @@ mariadb:
   sock: /var/lib/mysql/mysql.sock
   ulimit_dir: /etc/systemd/system/mariadb.service.d
   version: 10.2
-  repo_url: http://yum.mariadb.org/{{ version }}/centos7-amd64
-  repo_url_arm: http://yum.mariadb.org/{{ version }}/centos7-aarch64
+  repo_url: http://yum.mariadb.org/10.2/centos7-amd64
+  repo_url_arm: http://yum.mariadb.org/10.2/centos7-aarch64
   repo_key: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB

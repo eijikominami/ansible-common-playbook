@@ -1,8 +1,9 @@
 # /common_playbook/roles/zabbix-agent/defaults
 
+version:
+  zabbix_agent: 4.0
 zabbix:
-  shortver: 4.0
-  repo_url: http://repo.zabbix.com/zabbix/{{ shortver }}/rhel/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/
+  repo_url: http://repo.zabbix.com/zabbix/{{ version.zabbix_agent }}/rhel/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/
   repo_key: https://repo.zabbix.com/zabbix-official-repo.key
   agentd_conf: /etc/zabbix/zabbix_agentd.conf
   server: 127.0.0.1

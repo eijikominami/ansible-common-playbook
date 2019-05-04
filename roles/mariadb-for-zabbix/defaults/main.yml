@@ -1,8 +1,9 @@
 # /common_playbook/roles/mariadb-for-zabbix/defaults
 
+version:
+  mariadb: 10.2
 mariadb:
   srv_conf: /etc/my.cnf.d/server.cnf
-  version: 10.2
-  repo_url: http://yum.mariadb.org/{{ version }}/centos7-amd64
-  repo_url_arm: http://yum.mariadb.org/{{ version }}/centos7-aarch64
+  repo_url: http://yum.mariadb.org/{{ version.mariadb }}/centos7-amd64
+  repo_url_arm: http://yum.mariadb.org/{{ version.mariadb }}/centos7-aarch64
   repo_key: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB

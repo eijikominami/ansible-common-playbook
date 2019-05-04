@@ -1,6 +1,7 @@
 # /common_playbook/roles/fping/defaults
 
+version:
+  fping: 4.2
 fping:
-  version: 4.2
-  source_url: http://fping.org/dist/fping-{{ version }}.tar.gz
+  source_url: http://fping.org/dist/fping-{{ version.fping }}.tar.gz
   bin: /usr/local/sbin/fping

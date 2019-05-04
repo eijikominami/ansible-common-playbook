@@ -1,5 +1,6 @@
 # /common_playbook/roles/sox/defaults
 
+version:
+  sox: 14.4.2
 sox:
-  version: 14.4.2
   source_url: https://downloads.sourceforge.net/project/sox/sox/{{ version }}/sox-{{ version }}.tar.gz

@@ -1,7 +1,10 @@
 # /common_playbook/roles/httpd/defaults
 
+version:
+  httpd: 2.4.39
+  apr: 1.7.0
+  apr_util: 1.6.1
 httpd:
-  version: 2.4.39
   source_url: http://ftp.jaist.ac.jp/pub/apache/httpd/httpd-{{ version }}.tar.gz
   user: apache
   base_dir: /usr/local/apache2
@@ -33,8 +36,6 @@ httpd:
   max_connections_per_child: 0
   cros: null
 apr:
-  version: 1.7.0
-  source_url: http://ftp.jaist.ac.jp/pub/apache//apr/apr-{{ version }}.tar.gz
+  source_url: http://ftp.jaist.ac.jp/pub/apache//apr/apr-{{ version.apr }}.tar.gz
 apr_util:
-  version: 1.6.1
-  source_url: http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-{{ version }}.tar.gz
+  source_url: http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-{{ version.apr_util }}.tar.gz
