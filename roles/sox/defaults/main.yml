@@ -2,4 +2,4 @@
 
 sox:
   version: 14.4.2
-  source_url: https://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.gz
+  source_url: https://downloads.sourceforge.net/project/sox/sox/{{ version }}/sox-{{ version }}.tar.gz

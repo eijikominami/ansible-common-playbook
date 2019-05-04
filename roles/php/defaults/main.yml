@@ -1,8 +1,8 @@
 # /common_playbook/roles/php/defaults
 
 php:
-  version: 7.2.15
-  source_url: https://php.net/distributions/php-7.2.15.tar.gz
+  version: 7.2.18
+  source_url: https://php.net/distributions/php-{{ version }}.tar.gz
   ini: /etc/php.ini
   configure_options: --enable-mbstring --with-apxs2=/usr/bin/apxs --with-config-file-path=/etc --disable-libxml --disable-xmlwriter --disable-xmlreader --disable-simplexml --disable-xml --disable-dom --without-pear
   extensiondir: /usr/lib64/php/modules

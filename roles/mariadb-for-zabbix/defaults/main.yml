@@ -2,6 +2,7 @@
 
 mariadb:
   srv_conf: /etc/my.cnf.d/server.cnf
-  repo_url: http://yum.mariadb.org/10.2/centos7-amd64
-  repo_url_arm: http://yum.mariadb.org/10.2/centos7-aarch64
+  version: 10.2
+  repo_url: http://yum.mariadb.org/{{ version }}/centos7-amd64
+  repo_url_arm: http://yum.mariadb.org/{{ version }}/centos7-aarch64
   repo_key: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB

@@ -1,8 +1,8 @@
 # /common_playbook/roles/zabbix/defaults
 
 zabbix:
-  version: 4.0.5
-  source_url: https://downloads.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/4.0.5/zabbix-4.0.5.tar.gz?r=http%3A%2F%2Fwww.zabbix.com%2Fdownload&use_mirror=master
+  version: 4.2.1
+  source_url: https://downloads.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/{{ version }}/zabbix-{{ version }}.tar.gz?r=http%3A%2F%2Fwww.zabbix.com%2Fdownload&use_mirror=master
   conf: /usr/local/etc/zabbix_server.conf
   log_dir: /var/log/zabbix
   dir: /var/www/html/zabbix

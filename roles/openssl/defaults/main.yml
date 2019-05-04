@@ -2,6 +2,6 @@
 
 ssl:
   version: 1.0.2r
-  source_url: https://www.openssl.org/source/openssl-1.0.2r.tar.gz
+  source_url: https://www.openssl.org/source/openssl-{{ version }}.tar.gz
   dir: /usr/local/ssl
   so_lib_dir: /etc/ld.so.conf
