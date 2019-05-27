@@ -1,0 +1,9 @@
+# /common_playbook/roles/httpd/defaults
+
+version:
+  jmeter: 5.1.1
+jmeter:
+  base_dir: /usr/local/src
+  source_url: http://ftp.kddilabs.jp/infosystems/apache//jmeter/binaries/apache-jmeter-{{ version.jmeter }}.tgz
+  client_ip: 192.168.0.1
+  server_rmi_port: 24000

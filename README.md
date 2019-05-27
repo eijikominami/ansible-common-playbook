@@ -139,6 +139,16 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 - ユーザの作成
 - Gitlab Hook Pluginのインストール
 
+## jmeter
+- jmeterをインストールします。
+- 実行後、OSの再起動が必要です。
+- プロジェクトごとに以下の値の設定が必要です。
+
+| 変数名 | 型 | 内容 | デフォルト値 |
+| ---- | ---- | ---- | ---- |
+| **version.jmeter** | String | jmeterのバージョン名 | defaultsに指定の値 |
+| jmeter.client_ip | String | jmeterのclient ip | 192.168.0.1 |
+
 ## lsyncd
 - lsyncdをインストールします。
 - プロジェクトごとに以下の値の設定が必要です。

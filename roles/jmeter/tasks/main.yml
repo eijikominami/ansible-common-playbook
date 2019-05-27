@@ -1,0 +1,39 @@
+# /common_playbook/roles/httpd/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+#
+# {{ version.jmeter }}
+#
+####################################
+
+- name: "install the latest version of java-{{ jdk_ver }}-openjdk"
+  yum: name={{ packages }} state=latest
+  vars:
+    packages:
+      - java-{{ jdk_ver }}-openjdk
+
+- name: "delete the JMeter source files"
+  file: path={{ jmeter.base_dir }}/apache-jmeter-{{ version.jmeter }} state=absent
+
+- name: "download JMeter source files"
+  get_url: dest={{ jmeter.base_dir }}/ force=yes timeout={{ get_url_timeout }} url={{ jmeter.source_url }}
+
+- name: "unpack JMeter source files"
+  unarchive: remote_src=yes src={{ jmeter.base_dir }}/apache-jmeter-{{ version.jmeter }}.tgz dest=/usr/local/src
+
+- name: "add a block to jmeter.properties if it does not exist"
+  blockinfile:
+    path: "{{ jmeter.base_dir }}/apache-jmeter-{{ version.jmeter }}/bin/jmeter.properties"
+    backup: yes
+    block: |
+      server.rmi.localport={{ jmeter.server_rmi_port }}
+      server.rmi.ssl.disable=true
+
+- name: "add jmeter-server in rc.local"
+  blockinfile:
+     path: /etc/rc.local
+     backup: yes
+     block: |
+       cd {{ jmeter.base_dir }}/apache-jmeter-{{ version.jmeter }}/bin
+       ./jmeter-server
