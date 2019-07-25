@@ -4,6 +4,9 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 ## ansible
 - Ansibleをインストールします。
 
+## aws-sam-cli
+- AWS SAM CLIをインストールします。
+
 ## certbot
 - Let's Encryptコマンドをインストールします。
 - 証明書のインストールは別途コマンドの実行が必要です。
@@ -274,6 +277,13 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | httpd.compile_from_src | Bool | Apacheをソースから入れるか否か | false |
 | php.phpize | String | phpizeのパス | /usr/bin/phpize |
 | php.php_config | String | php-configのパス | /usr/bin/php-config |
+
+## php
+- Pythonをインストールします。
+
+| 変数名 | 型 | 内容 | デフォルト値 |
+| ---- | ---- | ---- | ---- |
+| **version.python** | String | pythonのバージョン名 | defaultsに指定の値 |
 
 ## repo
 - CentOS7リポジトリを設定します。

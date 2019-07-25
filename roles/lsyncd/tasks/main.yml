@@ -75,6 +75,7 @@
               -- 同期ディレイ
               delay = 0,
               source="{{sync.source_dir}}",
+              exclude={"/.aws/", "/.ssh/"},
               target="{{ lsyncd.exec_user }}@{{ item.address }}::{{ sync.module_name }}"
       }
   with_items: "{{ sync.dest_address }}"

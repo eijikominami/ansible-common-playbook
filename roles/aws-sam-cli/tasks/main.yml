@@ -1,0 +1,45 @@
+# /common_playbook/roles/aws-sam/tasks
+
+- name: "remove docker, docker-client, docker-client-latest, docker-common, docker-latest, docker-latest-logrotate, docker-logrotate, docker-engine"
+  yum: name={{ packages }} state=absent
+  vars:
+    packages:
+      - docker
+      - docker-client
+      - docker-client-latest
+      - docker-common
+      - docker-latest
+      - docker-latest-logrotate
+      - docker-logrotate
+      - docker-engine
+
+- name: "install the latest version of yum-utils, device-mapper-persistent-data, lvm2"
+  yum: name={{ packages }} state=latest
+  vars:
+    packages:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+
+- name: "add docker repo"
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  args:
+    chdir: /etc/yum.repos.d
+    creates: docker-ce.repo
+
+- name: "install the latest version of docker-ce"
+  yum: name=docker-ce state=latest
+  notify:
+  - reload systemd daemon
+  - restart docker
+
+- name: "start service docker, if not running"
+  service: name=docker state=started enabled=yes
+
+# pip3で実行
+- name: "install the latest version of setuptools, aws-sam-cli"
+  pip: name={{ packages }} executable=pip3 state=latest
+  vars:
+    packages:
+      - setuptools
+      - aws-sam-cli

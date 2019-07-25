@@ -1,0 +1,48 @@
+# /common_playbook/roles/python/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+#
+# {{ version.python }}
+#
+####################################
+
+- name: "install the latest version of zlib-devel, libffi-devel, bzip2-devel, openssl-devel, ncurses-devel, sqlite-devel, readline-devel, tk-devel, gdbm-devel, libuuid-devel, xz-devel"
+  yum: name={{ packages }} state=latest
+  vars:
+    packages:
+      - zlib-devel
+      - libffi-devel
+      - bzip2-devel
+      - openssl-devel
+      - ncurses-devel
+      - sqlite-devel
+      - readline-devel
+      - tk-devel
+      - gdbm-devel
+      - libuuid-devel
+      - xz-devel
+
+- name: "delete the python source files"
+  file: path=/usr/local/src/Python-{{ version.python }} state=absent
+
+- name: "download python source files"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ python.source_url }}"
+
+- name: "unpack python source files"
+  unarchive: remote_src=yes src=/tmp/Python-{{ version.python }}.tgz dest=/usr/local/src
+
+- name: "configure python programs"
+  command: chdir=/usr/local/src/Python-{{ version.python }} ./configure
+
+- name: "make python programs"
+  make: chdir=/usr/local/src/Python-{{ version.python }}
+
+- name: "install python programs"
+  make: chdir=/usr/local/src/Python-{{ version.python }} target=altinstall
+
+- name: "create a symbolic link of python3"
+  file: src=/usr/local/bin/python{{ version.pythonshort }} dest=/usr/bin/python3 state=link
+
+- name: "create a symbolic link of pip3"
+  file: src=/usr/local/bin/pip{{ version.pythonshort }} dest=/usr/bin/pip3 state=link
