@@ -1,0 +1,4 @@
+# /common_playbook/roles/sphinx/defaults
+
+texlive:
+  source_url: http://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet/install-tl-unx.tar.gz

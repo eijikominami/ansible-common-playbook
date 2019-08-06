@@ -11,4 +11,9 @@
       - recommonmark
       - sphinx_rtd_theme
       - sphinx_bootstrap_theme
-      - texlive-*
+
+- name: "download texlive source files"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ texlive.source_url }}"
+
+- name: "unpack texlive source files"
+  unarchive: remote_src=yes src=/tmp/install-tl-unx.tar.gz dest=/usr/local/src
