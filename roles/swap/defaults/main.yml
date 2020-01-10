@@ -1,0 +1,4 @@
+# /common_playbook/roles/swap/defaults
+
+swap:
+  file_path: /swapfile 

@@ -1,0 +1,31 @@
+# /common_playbook/roles/swap/tasks
+
+- name: "create a swap file"
+  command: dd if=/dev/zero of={{ swap.file_path }} bs={{ ansible_memtotal_mb }} count=1M
+  args:
+    creates: "{{ swap.file_path }}"
+
+- name: "change a permission of the file"
+  file: path="{{ swap.file_path }}" mode=0600
+
+- name: "determine the type of the file"
+  command: file {{ swap.file_path }}
+  register: swap_file_test
+
+- name: "setup a swap area"
+  command: mkswap {{ swap.file_path }}
+  when: swap_file_test.stdout.find('swap file') == -1
+
+- name: "specify devices on which paging and swapping are to take place"
+  command: swapon {{ swap.file_path }}
+  when: ansible_swaptotal_mb < 1
+
+- name: "mount the swap area"
+  mount:
+    name: swap
+    src: "{{ swap.file_path }}"
+    fstype: swap
+    opts: defaults
+    passno: '0'
+    dump: '0'
+    state: present
