@@ -1,4 +1,5 @@
 # /common_playbook/roles/swap/defaults
 
 swap:
-  file_path: /swapfile 
+  file_path: /swapfile
+  mag: 2

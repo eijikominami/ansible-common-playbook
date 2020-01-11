@@ -1,7 +1,7 @@
 # /common_playbook/roles/swap/tasks
 
 - name: "create a swap file"
-  command: dd if=/dev/zero of={{ swap.file_path }} bs={{ ansible_memtotal_mb }} count=1M
+  command: dd if=/dev/zero of={{ swap.file_path }} bs={{ ansible_memtotal_mb * swap.mag }} count=1M
   args:
     creates: "{{ swap.file_path }}"
 
