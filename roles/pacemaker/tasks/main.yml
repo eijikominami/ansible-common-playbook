@@ -20,9 +20,23 @@
       - corosync
       - pcs
       - elfutils-libelf-devel
+  when: not ansible_distribution_major_version == "8"
+
+- name: "install the latest version of pacemaker, corosync, pcs, elfutils-libelf-devel"
+  yum: name={{ packages }} state=latest enablerepo=HighAvailability
+  vars:
+    packages:
+      - pacemaker
+      - corosync
+      - pcs
+      - elfutils-libelf-devel
+  when: ansible_distribution_major_version == "8"
+
+- name: "add the group 'haclient'"
+  user: name=haclient state=present
 
 - name: "add the user 'hacluster'"
-  user: name=hacluster password={{ pacemaker.hacluster_password | password_hash('sha512') }}
+  user: name=hacluster password={{ pacemaker.hacluster_password | password_hash('sha512') }} group=haclient
 
 - name: "add a block to /etc/hosts if it does not exist"
   blockinfile:
@@ -41,11 +55,23 @@
 # プライマリーサーバのみで実行
 - name: "authorize pcs cluster users and hosts"
   command: "pcs cluster auth {{ pacemaker.primary_host }} {{ pacemaker.secondary_host }} -u hacluster -p {{ pacemaker.hacluster_password }}" 
-  when: inventory_hostname in groups['primary']  
+  when: inventory_hostname in groups['primary']  and not ansible_distribution_major_version == "8"
+
+- name: "authorize a primary host"
+  command: "pcs host auth {{ pacemaker.primary_host }} -u hacluster -p {{ pacemaker.hacluster_password }}" 
+  when: inventory_hostname in groups['primary']  and ansible_distribution_major_version == "8"
+
+- name: "authorize a secondary host"
+  command: "pcs host auth {{ pacemaker.secondary_host }} -u hacluster -p {{ pacemaker.hacluster_password }}" 
+  when: inventory_hostname in groups['primary']  and ansible_distribution_major_version == "8"
 
 - name: "create '{{ pacemaker.cluster_name }}' cluster"
   command: "pcs cluster setup --name {{ pacemaker.cluster_name }} {{ pacemaker.primary_host }} {{ pacemaker.secondary_host }}"
-  when: inventory_hostname in groups['primary']  
+  when: inventory_hostname in groups['primary'] and not ansible_distribution_major_version == "8"
+
+- name: "create '{{ pacemaker.cluster_name }}' cluster"
+  command: "pcs cluster setup {{ pacemaker.cluster_name }} {{ pacemaker.primary_host }} {{ pacemaker.secondary_host }}"
+  when: inventory_hostname in groups['primary'] and ansible_distribution_major_version == "8"
 
 - name: "start all clusters"
   command: "pcs cluster start --all"

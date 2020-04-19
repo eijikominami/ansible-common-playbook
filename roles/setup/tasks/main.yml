@@ -19,7 +19,11 @@
 
 - name: "add epel repository"
   yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
-  when: ansible_architecture is not match("^arm")
+  when: ansible_architecture is not match("^arm") and not ansible_distribution_major_version == "8"
+
+- name: "add epel repository"
+  yum_repository: name=epel description=epel metalink="{{ epel_metalink }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
+  when: ansible_architecture is not match("^arm") and ansible_distribution_major_version == "8"
 
 - name: "add epel repository"
   yum_repository: name=epel description=epel baseurl="{{ epel_repo_arm }}" gpgcheck=no enabled=no
@@ -34,6 +38,15 @@
       - libselinux-python
       - git
       - python-pip
+  when: not ansible_distribution_major_version == "8"
+
+- name: "install the latest version of wget, git"
+  yum: name={{ packages }} state=latest enablerepo=epel
+  vars:
+    packages:
+      - wget
+      - git
+  when: ansible_distribution_major_version == "8"
 
 # expactモジュールの利用に必要
 - name: "install pexpect package"
@@ -48,7 +61,7 @@
 
 - name: "stop service firewalld"
   service: name=firewalld enabled=no state=stopped
-  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+  when: ansible_distribution == "CentOS" and not ansible_distribution_major_version == "6"
 
 - name: "retrieve selinux config"
   stat: path=/etc/selinux/config

@@ -1,6 +1,7 @@
 # /common_playbook/roles/brbd/defaults
 
 drbd:
+  vg_name: cl
   global_conf: /etc/drbd.d/global_common.conf
   resource_dir: /etc/drbd.d/
   resource_name: default

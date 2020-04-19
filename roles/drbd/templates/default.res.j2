@@ -2,8 +2,8 @@ resource {{ drbd.resource_name }} {
 {% for item in drbd.partition %}
   volume {{ item.id }} {
     device /dev/drbd{{ item.id }};
-    disk /dev/mapper/cl-{{ item.name }};
-    meta-disk /dev/mapper/cl-drbd [{{ item.id }}];
+    disk /dev/mapper/{{ drbd.vg_name }}-{{ item.name }};
+    meta-disk /dev/mapper/{{ drbd.vg_name }}-drbd [{{ item.id }}];
   }
 {% endfor %}
   on {{ pacemaker.primary_host }} {

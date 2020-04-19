@@ -19,7 +19,7 @@
 
 # 論理ボリュームを作成
 - name: "create a drbd meta data volume"
-  lvol: vg=cl lv={{ drbd.metavol_name }} size={{ drbd.metavol_size }}
+  lvol: vg={{ drbd.vg_name }} lv={{ drbd.metavol_name }} size={{ drbd.metavol_size }}
 
 - name: "put {{ drbd.global_conf }}"
   template: src=global_common.conf.j2 dest="{{ drbd.global_conf }}"
