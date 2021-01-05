@@ -1,0 +1,4 @@
+# /common_playbook/roles/certbot/defaults
+
+certbot:
+  auto_update_script_path: /usr/local/bin/update_cert.sh

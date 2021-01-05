@@ -9,3 +9,13 @@
     packages:
       - certbot
       - python-certbot-apache
+      - pip3
+
+- name: "install the latest version of certbot-dns-route53"
+  pip: name=certbot-dns-route53 executable=pip3 state=latest
+
+- name: "add a {{ certbot.auto_update_script_path }} if it does not exist"
+  copy: src=update_cert.sh dest={{ certbot.auto_update_script_path }} owner=root group=root mode=0744
+
+- name: "create a job that updates certbot certification"
+  cron: name="renew certbot certification" weekday="8" hour="2" minute="0" job="{{ certbot.auto_update_script_path }}"
