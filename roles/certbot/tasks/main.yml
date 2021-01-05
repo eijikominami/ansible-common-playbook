@@ -11,7 +11,7 @@
       - python-certbot-apache
 
 - name: "install the latest version of certbot-dns-route53"
-  pip: name=certbot-dns-route53 state=latest
+  pip: name=certbot-dns-route53 executable=pip3 state=latest
 
 - name: "add a {{ certbot.auto_update_script_path }} if it does not exist"
   copy: src=update_cert.sh dest={{ certbot.auto_update_script_path }} owner=root group=root mode=0744

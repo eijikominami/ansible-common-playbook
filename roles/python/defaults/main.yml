@@ -1,7 +1,9 @@
 # /common_playbook/roles/python/defaults
 
 version:
-  python: 3.7.3
-  pythonshort: 3.7
+  python: 3.9.1
+  pythonshort: 3.9
+ssl:
+  bin: /usr/bin/openssl
 python:
   source_url: https://www.python.org/ftp/python/{{ version.python }}/Python-{{ version.python }}.tgz
