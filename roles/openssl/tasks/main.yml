@@ -55,6 +55,13 @@
   command: "{{ ssl.dir }}/bin/openssl version"
   register: openssl_version
   changed_when: false
+  when: version.ssl.find('1.1.') == -1
+
+- name: "show version of openssl"
+  command: "/usr/local/bin/openssl version"
+  register: openssl_version
+  changed_when: false
+  when: version.ssl.find('1.1.') != -1
 
 - name: "debug version of openssl"
   debug: var=openssl_version.stdout_lines

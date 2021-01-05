@@ -1,7 +1,7 @@
 # /common_playbook/roles/httpd/defaults
 
 version:
-  httpd: 2.4.39
+  httpd: 2.4.46
   apr: 1.7.0
   apr_util: 1.6.1
 httpd:

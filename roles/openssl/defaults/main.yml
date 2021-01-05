@@ -1,7 +1,7 @@
 # /common_playbook/roles/ssl/defaults
 
 version:
-  ssl: 1.0.2r
+  ssl: 1.1.1i
 ssl:
   source_url: https://www.openssl.org/source/openssl-{{ version.ssl }}.tar.gz
   dir: /usr/local/ssl
