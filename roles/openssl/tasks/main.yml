@@ -41,6 +41,11 @@
 # 共通ライブラリにSSLライブラリのパスを追加する
 - name: "add ssl library location in {{ ssl.so_lib_dir }}"
   lineinfile: path={{ ssl.so_lib_dir }} line="{{ ssl.dir }}/lib" backup=yes
+  when: version.ssl.find('1.1.') == -1
+
+- name: "add ssl library location in {{ ssl.so_lib_dir }}"
+  lineinfile: path={{ ssl.so_lib_dir }} line="/usr/local/src/openssl-{{version.ssl}}/" backup=yes
+  when: version.ssl.find('1.1.') != -1
 
 # 共通ライブラリの再読み込みを行う
 - name: "configure dynamic linker run time bindings"
