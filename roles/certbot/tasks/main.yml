@@ -17,4 +17,4 @@
   copy: src=update_cert.sh dest={{ certbot.auto_update_script_path }} owner=root group=root mode=0744
 
 - name: "create a job that updates certbot certification"
-  cron: name="renew certbot certification" weekday="8" hour="2" minute="0" job="{{ certbot.auto_update_script_path }}"
+  cron: name="renew certbot certification" month="*/2" hour="2" minute="0" job="{{ certbot.auto_update_script_path }}"
