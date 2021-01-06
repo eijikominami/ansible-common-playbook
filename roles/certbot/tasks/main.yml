@@ -1,17 +1,12 @@
 # /common_playbook/roles/certbot/tasks
 
-- name: "add epel repository"
-  yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
-
-- name: "install the latest version of certbot, python-certbot-apache"
-  yum: name={{ packages }} state=latest enablerepo=epel
+- name: "install the latest version of certbot, certbot-apache, certbot-dns-route53"
+  pip: name={{ packages }}  executable=pip3 state=latest
   vars:
     packages:
       - certbot
-      - python-certbot-apache
-
-- name: "install the latest version of certbot-dns-route53"
-  pip: name=certbot-dns-route53 executable=pip3 state=latest
+      - certbot-apache
+      - certbot-dns-route53
 
 - name: "add a {{ certbot.auto_update_script_path }} if it does not exist"
   copy: src=update_cert.sh dest={{ certbot.auto_update_script_path }} owner=root group=root mode=0744
