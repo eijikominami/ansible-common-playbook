@@ -2,3 +2,6 @@
 
 certbot:
   auto_update_script_path: /usr/local/bin/update_cert.sh
+  domain: example.com
+httpd:
+  base_dir: /usr/local/apache2

@@ -1,5 +1,13 @@
 # /common_playbook/roles/certbot/tasks
 
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+#
+# {{ certbot.domain }}
+# {{ httpd.base_dir }}
+#
+####################################
+
 - name: "install the latest version of certbot, certbot-apache, certbot-dns-route53"
   pip: name={{ packages }}  executable=pip3 state=latest
   vars:
@@ -8,8 +16,8 @@
       - certbot-apache
       - certbot-dns-route53
 
-- name: "add a {{ certbot.auto_update_script_path }} if it does not exist"
-  copy: src=update_cert.sh dest={{ certbot.auto_update_script_path }} owner=root group=root mode=0744
+- name: "put {{ certbot.auto_update_script_path }}"
+  template: src=update_cert.j2 dest="{{ certbot.auto_update_script_path }}" owner=root group=root mode=0744
 
 - name: "create a job that updates certbot certification"
   cron: name="renew certbot certification" month="*/2" hour="2" minute="0" job="{{ certbot.auto_update_script_path }}"

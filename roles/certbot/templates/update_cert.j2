@@ -1,0 +1,5 @@
+#! /bin/bash
+
+certbot renew --no-self-upgrade --server https://acme-v02.api.letsencrypt.org/directory --agree-tos --dns-route53
+cp /etc/letsencrypt/live/{{certbot.domain}}/fullchain.pem {{httpd.base_dir}}/conf/server.crt
+{{httpd.base_dir}}/bin/apachectl restart
