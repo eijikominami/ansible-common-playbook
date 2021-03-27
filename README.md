@@ -123,7 +123,7 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | status_module | サーバの性能等に関する情報を提供 | |
 | dir_module | スラッシュのリダイレクト | |
 | alias_module | エイリアス機能 | |
-| php7_module | PHP対応 | |
+| php_module | PHP対応 | |
 
 ## httpd-for-zabbix
 - Zabbix用のApacheをインストールします。
