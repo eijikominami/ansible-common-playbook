@@ -15,7 +15,7 @@
 
 # @Development toolsはstate=presentを指定
 - name: "install the latest version of @Development tools"
-  dnf: name="@Development tools" state=present
+  yum: name="@Development tools" state=present
 
 - name: "add epel repository"
   yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
@@ -30,7 +30,7 @@
   when: ansible_architecture is match("^arm")
 
 - name: "install the latest version of wget, ntpdate, libselinux-python, git, python-pip"
-  dnf: name={{ packages }} state=latest enablerepo=epel
+  yum: name={{ packages }} state=latest enablerepo=epel
   vars:
     packages:
       - wget
@@ -41,7 +41,7 @@
   when: not ansible_distribution_major_version == "8"
 
 - name: "install the latest version of wget, git"
-  dnf: name={{ packages }} state=latest enablerepo=epel
+  yum: name={{ packages }} state=latest enablerepo=epel
   vars:
     packages:
       - wget

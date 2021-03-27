@@ -11,7 +11,7 @@
   yum_repository: name=elrepo description=elrepo baseurl="{{ elrepo.repo_url }}" gpgkey="{{ elrepo.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 - name: "install the latest version of kmod-drbd90, drbd90-utils"
-  dnf: name={{ packages }} state=installed enablerepo=elrepo
+  yum: name={{ packages }} state=installed enablerepo=elrepo
   vars:
     packages:
       - kmod-drbd90

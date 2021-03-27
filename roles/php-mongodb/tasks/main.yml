@@ -18,7 +18,7 @@
   when: ansible_architecture is match("^arm")
 
 - name: "install the latest version of re2c"
-  dnf: name=re2c state=latest enablerepo=epel
+  yum: name=re2c state=latest enablerepo=epel
 
 - name: "delete existing mongodb library source files"
   file: path="{{ php_mongo.basedir }}" state=absent

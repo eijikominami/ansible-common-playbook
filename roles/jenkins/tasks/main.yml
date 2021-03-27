@@ -9,7 +9,7 @@
 ####################################
 
 - name: "install the latest version of java-{{ jdk_ver }}-openjdk, httpd"
-  dnf: name={{ packages }} state=latest
+  yum: name={{ packages }} state=latest
   vars:
     packages:
       - java-{{ jdk_ver }}-openjdk
@@ -19,7 +19,7 @@
   yum_repository: name=jenkins description=jenkins baseurl="{{ jenkins.repo_url }}" gpgkey="{{ jenkins.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 - name: "install the latest version of jenkins"
-  dnf: name=jenkins state=latest enablerepo=jenkins
+  yum: name=jenkins state=latest enablerepo=jenkins
 
 - name: "edit JENKINS_ARGS in {{ jenkins.conf }}"
   replace: path="{{ jenkins.conf }}" regexp='.*JENKINS_ARGS.*=.*$' replace="JENKINS_ARGS="--prefix=/jenkins"" backup=yes

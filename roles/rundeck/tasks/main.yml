@@ -9,13 +9,13 @@
 ####################################
 
 - name: "install the latest version of java-{{ jdk_ver }}-openjdk"
-  dnf: name=java-{{ jdk_ver }}-openjdk state=latest
+  yum: name=java-{{ jdk_ver }}-openjdk state=latest
 
 - name: "add rundeck repository"
   yum_repository: name=rundeck description=rundeck baseurl="{{ rundeck.repo_url }}" gpgkey="{{ rundeck.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 - name: "install the latest version of rundeck"
-  dnf: name=rundeck state=latest enablerepo=rundeck
+  yum: name=rundeck state=latest enablerepo=rundeck
 
 - name: "edit grails.serverURL in {{ rundeck.conf }}"
   replace: path="{{ rundeck.conf }}" regexp='grails.serverURL=.*$' replace="grails.serverURL=http://{{ ansible_default_ipv4.address }}/rundeck" backup=yes

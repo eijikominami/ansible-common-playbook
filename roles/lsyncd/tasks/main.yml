@@ -11,7 +11,7 @@
 ####################################
 
 - name: "install the latest version of cmake, lua, lua-devel, asciidoc, gcc, logrotate"
-  dnf: name={{ packages }} state=latest
+  yum: name={{ packages }} state=latest
   vars:
     packages:
       - cmake
