@@ -12,7 +12,7 @@
 
 # Zabbixのインストールに必要なパッケージ
 - name: "install the latest version of libxml2-devel, net-snmp, net-snmp-devel, libcurl-devel"
-  yum: name={{ packages }} state=latest
+  dnf: name={{ packages }} state=latest
   vars:
     packages:
       - libxml2-devel

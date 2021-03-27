@@ -12,7 +12,7 @@
 
 # GPG KEYチェックなし
 - name: "install the latest version of zabbix-agent"
-  yum: name=zabbix-agent state=latest disable_gpg_check=yes enablerepo=zabbix
+  dnf: name=zabbix-agent state=latest disable_gpg_check=yes enablerepo=zabbix
 
 # 接続するZabbixサーバのアドレスを指定
 - name: "edit Server of {{ zabbix.agentd_conf }}"

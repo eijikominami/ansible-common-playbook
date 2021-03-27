@@ -12,7 +12,7 @@
   yum_repository: name=elasticsearch description=elasticsearch baseurl="{{ elasticsearch.repo_url }}" gpgkey="{{ elasticsearch.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
 
 - name: "install the latest version of java-{{ jdk_ver }}-openjdk-devel, java-{{ jdk_ver }}-openjdk-debuginfo, elasticsearch, logstash, kibana, metricbeat, packetbeat, filebeat, heartbeat"
-  yum: name={{ packages }} state=latest enablerepo=elasticsearch,base-debuginfo
+  dnf: name={{ packages }} state=latest enablerepo=elasticsearch,base-debuginfo
   vars:
     packages:
       - java-{{ jdk_ver }}-openjdk-devel

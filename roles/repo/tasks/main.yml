@@ -9,7 +9,7 @@
   when: ansible_architecture is match("^arm")
 
 - name: "install the latest version of createrepo, yum-utils, httpd"
-  yum: name={{ packages }} state=latest enablerepo=epel
+  dnf: name={{ packages }} state=latest enablerepo=epel
   vars:
     packages:
       - createrepo

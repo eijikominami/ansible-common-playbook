@@ -8,7 +8,7 @@
 ####################################
 
 - name: "install the latest version of java-{{ jdk_ver }}-openjdk"
-  yum: name={{ packages }} state=latest
+  dnf: name={{ packages }} state=latest
   vars:
     packages:
       - java-{{ jdk_ver }}-openjdk

@@ -1,7 +1,7 @@
 # /common_playbook/roles/sphinx/tasks
 
 - name: "install the latest version of python-sphinx"
-  yum: name=python-sphinx state=latest enablerepo=epel
+  dnf: name=python-sphinx state=latest enablerepo=epel
 
 - name: "install the latest version of commonmark, recommonmark, sphinx_rtd_theme, sphinx_bootstrap_theme"
   pip: name={{ packages }} state=latest

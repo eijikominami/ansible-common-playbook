@@ -1,7 +1,7 @@
 # /common_playbook/roles/aws-sam/tasks
 
 - name: "remove docker, docker-client, docker-client-latest, docker-common, docker-latest, docker-latest-logrotate, docker-logrotate, docker-engine"
-  yum: name={{ packages }} state=absent
+  dnf: name={{ packages }} state=absent
   vars:
     packages:
       - docker
@@ -14,7 +14,7 @@
       - docker-engine
 
 - name: "install the latest version of yum-utils, device-mapper-persistent-data, lvm2"
-  yum: name={{ packages }} state=latest
+  dnf: name={{ packages }} state=latest
   vars:
     packages:
       - yum-utils
@@ -28,7 +28,7 @@
     creates: docker-ce.repo
 
 - name: "install the latest version of docker-ce"
-  yum: name=docker-ce state=latest
+  dnf: name=docker-ce state=latest
   notify:
   - reload systemd daemon
   - restart docker

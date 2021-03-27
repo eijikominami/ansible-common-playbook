@@ -10,7 +10,7 @@
 ####################################
 
 - name: "install the latest version of zlib-devel, libffi-devel, bzip2-devel, openssl-devel, ncurses-devel, sqlite-devel, readline-devel, tk-devel, gdbm-devel, libuuid-devel, xz-devel"
-  yum: name={{ packages }} state=latest
+  dnf: name={{ packages }} state=latest
   vars:
     packages:
       - zlib-devel

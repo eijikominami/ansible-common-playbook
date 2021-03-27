@@ -17,7 +17,7 @@
 
 # スクリプト実行に必要なパッケージ
 - name: "install the latest version of usbutils, alsa-lib-devel, alsa-utils, gcc-c++, libmad, libmad-devel, libid3tag, libid3tag-devel, lame, lame-devel, flac-devel, libvorbis-devel"
-  yum: name={{ packages }} state=latest enablerepo=epel
+  dnf: name={{ packages }} state=latest enablerepo=epel
   vars:
     packages:
       - gcc-c++

@@ -28,14 +28,14 @@
   when: ansible_architecture is match("^arm")
 
 - name: "install the latest version of re2c, curl-devel"
-  yum: name={{ packages }} state=latest enablerepo=epel
+  dnf: name={{ packages }} state=latest enablerepo=epel
   vars:
     packages:
       - re2c
       - curl-devel
 
 - name: "remove PHP packages"
-  yum: name={{ packages }} state=absent
+  dnf: name={{ packages }} state=absent
   vars:
     packages:
       - php

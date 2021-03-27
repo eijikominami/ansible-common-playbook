@@ -11,7 +11,7 @@
 ####################################
 
 - name: "install the latest version of curl, policycoreutils, openssh-server, openssh-clients, deltarpm"
-  yum: name={{ packages }} state=latest
+  dnf: name={{ packages }} state=latest
   vars:
     packages:
       - curl
@@ -28,7 +28,7 @@
 
 # GitLab Community Editionのインストール
 - name: "install the latest version of gitlab-ce"
-  yum: name=gitlab-ce state=latest enablerepo=gitlab_gitlab-ce
+  dnf: name=gitlab-ce state=latest enablerepo=gitlab_gitlab-ce
   notify:
     - configure and start gitlab
 

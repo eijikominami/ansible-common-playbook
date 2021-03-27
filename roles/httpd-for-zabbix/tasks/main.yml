@@ -2,7 +2,7 @@
 
 # Zabbixの使用に必要なパッケージ
 - name: "install the latest version of httpd, php, php-bcmath, php-mbstring, php-gd, php-xml, php-mysqli"
-  yum: name={{ packages }} state=latest
+  dnf: name={{ packages }} state=latest
   vars:
     packages:
       - httpd

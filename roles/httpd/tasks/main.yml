@@ -29,7 +29,7 @@
 # expat-devel	: Perl 5 互換の正規表現をC言語で実装したライブラリ	-> Apacheのコンパイルに使用
 # lynx			: テキストベースブラウザ							-> Apache Statusの確認に使用
 - name: "install the latest version of pcre-devel, lynx, logrotate"
-  yum: name={{ packages }} state=latest
+  dnf: name={{ packages }} state=latest
   vars:
     packages:
       - pcre-devel

@@ -9,7 +9,7 @@
 
 # コンパイルに必要なパッケージをインストール
 - name: "install the latest version of gcc, zlib-devel"
-  yum: name={{ packages }} state=latest
+  dnf: name={{ packages }} state=latest
   vars:
     packages:
       - gcc
