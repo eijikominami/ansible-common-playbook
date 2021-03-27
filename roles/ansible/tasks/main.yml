@@ -9,7 +9,7 @@
   when: ansible_architecture is match("^arm")
 
 - name: "install the latest version of ansible"
-  dnf: name=ansible state=latest enablerepo=epel
+  yum: name=ansible state=latest enablerepo=epel
 
 - name: "create ansible log if it does not exist"
   file: path="{{ ansible.log }}" state=touch owner=root group=root mode=0666

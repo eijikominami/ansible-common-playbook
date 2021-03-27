@@ -27,15 +27,18 @@
   yum_repository: name=epel description=epel baseurl="{{ epel_repo_arm }}" gpgcheck=no enabled=no
   when: ansible_architecture is match("^arm")
 
-- name: "install the latest version of re2c, curl-devel"
-  dnf: name={{ packages }} state=latest enablerepo=epel
+- name: "install the latest version of autoconf, automake, libtool, re2c, bison"
+  yum: name={{ packages }} state=latest
   vars:
     packages:
+      - autoconf
+      - automake
+      - libtool
       - re2c
-      - curl-devel
+      - bison
 
 - name: "remove PHP packages"
-  dnf: name={{ packages }} state=absent
+  yum: name={{ packages }} state=absent
   vars:
     packages:
       - php
@@ -98,7 +101,7 @@
     backup: yes
     block: |
       <FilesMatch "\.php$">
-         AddHandler php7-script .php
+         AddHandler php-script .php
          AddType application/x-httpd-php .php
       </FilesMatch>
 

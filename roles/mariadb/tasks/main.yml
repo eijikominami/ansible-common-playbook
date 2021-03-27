@@ -1,12 +1,5 @@
 # /common_playbook/roles/mariadb/tasks
 
-# ATTENTION ########################
-# 以下の値は、各プロジェクトごとに指定すること
-# 
-# {{ version.mariadb }}
-#
-####################################
-
 - name: "add mariadb repository"
   yum_repository: name=mariadb description=mariadb baseurl="{{ mariadb.repo_url }}" gpgkey="{{ mariadb.repo_key }}" gpgcheck={{ gpgcheck }} enabled=no
   when: ansible_architecture is not match("^arm")
@@ -18,14 +11,14 @@
 # mariadbの使用に必要なパッケージ
 # 既にmariadb 5.x系がインストール済みの環境の場合は、mariadb, mariadb-server, mariadb-libsをアンインストールしておく
 - name: "install the latest version of MariaDB-client, MariaDB-server"
-  dnf: name={{ packages }} state=latest enablerepo=mariadb
+  yum: name={{ packages }} state=latest enablerepo=mariadb
   vars:
     packages:
       - mariadb
       - mariadb-server
 
 - name: "install the latest version of php-mysql"
-  dnf: name=php-mysql state=latest
+  yum: name=php-mysql state=latest
 
 # SQLパラメータチューニング(ver5.5-デフォルト値)
 #

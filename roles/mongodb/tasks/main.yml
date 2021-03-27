@@ -5,7 +5,7 @@
 
 # mongodb-org-mongosインストール時に証明書エラーが発生するためdisable_gpg_check=yesを指定
 - name: "install the latest version of mongodb-org, mongodb-org-server, mongodb-org-shell, mongodb-org-tools, mongodb-org-mongos"
-  dnf: name={{ packages }} state=latest disable_gpg_check=yes enablerepo=mongodb
+  yum: name={{ packages }} state=latest disable_gpg_check=yes enablerepo=mongodb
   vars:
     packages:
       - mongodb-org

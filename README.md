@@ -123,7 +123,7 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | status_module | サーバの性能等に関する情報を提供 | |
 | dir_module | スラッシュのリダイレクト | |
 | alias_module | エイリアス機能 | |
-| php7_module | PHP対応 | |
+| php_module | PHP対応 | |
 
 ## httpd-for-zabbix
 - Zabbix用のApacheをインストールします。
@@ -179,7 +179,6 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
-| **version.mariadb** | String | mariadbのバージョン名 | defaultsに指定の値 |
 | mariadb.table_open_cache | String | 開いたままにするファイル数 | 400 |
 | mariadb.query_cache_size | String | クエリ結果をキャッシュするために割り当てられたメモリーの量 | 0M |
 | mariadb.wait_timeout | String | 非インタラクティブな接続を閉じる前に、サーバーがその接続上でアクティビティーを待機する秒数 | 28800sec |
@@ -287,11 +286,12 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | php.phpize | String | phpizeのパス | /usr/bin/phpize |
 | php.php_config | String | php-configのパス | /usr/bin/php-config |
 
-## php
+## python
 - Pythonをインストールします。
 
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
+| ssl.dir | String | OpenSSLのディレクトリ | /usr/local/ssl |
 | **version.python** | String | pythonのバージョン名 | defaultsに指定の値 |
 
 ## repo

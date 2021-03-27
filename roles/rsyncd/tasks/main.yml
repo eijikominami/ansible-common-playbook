@@ -20,7 +20,7 @@
 
 # ログローテート
 - name: "install the latest version of logrotate"
-  dnf: name=logrotate state=latest
+  yum: name=logrotate state=latest
 
 # パーミッション644を指定しないとエラーで実行されない
 - name: "add a {{ rsyncd.logrotate }} if it does not exist"

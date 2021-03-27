@@ -18,7 +18,7 @@
 # mariadbの使用に必要なパッケージ
 # ansibleのmysql_dbを使用する際はMySQL-pythonパッケージが必要
 - name: "install the latest version of mariadb, mariadb-server, mariadb-devel, MySQL-python"
-  dnf: name={{ packages }} state=latest
+  yum: name={{ packages }} state=latest
   vars:
     packages:
       - mariadb

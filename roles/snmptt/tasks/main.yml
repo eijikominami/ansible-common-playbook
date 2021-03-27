@@ -19,7 +19,7 @@
 
 # SNMPTTのインストールに必要なパッケージ
 - name: "install the latest version of net-snmp-utils, net-snmp-perl, perl-Sys-Syslog, perl(SNMP), perl(XML::Simple)"
-  dnf: name={{ packages }} state=latest
+  yum: name={{ packages }} state=latest
   vars:
     packages:
       - net-snmp-utils
@@ -29,7 +29,7 @@
       - perl(XML::Simple)
 
 - name: "install the latest version of snmptt"
-  dnf: name={{ packages }} state=latest enablerepo=epel
+  yum: name={{ packages }} state=latest enablerepo=epel
   vars:
     packages:
       - snmptt

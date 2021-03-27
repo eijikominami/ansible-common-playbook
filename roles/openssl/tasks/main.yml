@@ -9,7 +9,7 @@
 
 # コンパイルに必要なパッケージをインストール
 - name: "install the latest version of gcc, zlib-devel"
-  dnf: name={{ packages }} state=latest
+  yum: name={{ packages }} state=latest
   vars:
     packages:
       - gcc
@@ -43,13 +43,19 @@
   lineinfile: path={{ ssl.so_lib_dir }} line="{{ ssl.dir }}/lib" backup=yes
   when: version.ssl.find('1.1.') == -1
 
-- name: "add ssl library location in {{ ssl.so_lib_dir }}"
-  lineinfile: path={{ ssl.so_lib_dir }} line="/usr/local/src/openssl-{{version.ssl}}/" backup=yes
-  when: version.ssl.find('1.1.') != -1
-
 # 共通ライブラリの再読み込みを行う
 - name: "configure dynamic linker run time bindings"
   command: ldconfig
+  when: version.ssl.find('1.1.') == -1
+
+# /lib64 にシンボリックリンクを作成
+- name: "create a symbolic link of libcrypto.so"
+  file: state=link src=/usr/local/lib64/libcrypto.so.1.1 path=/lib64/libcrypto.so
+  when: version.ssl.find('1.1.') != -1
+
+- name: "create a symbolic link of libssl.so"
+  file: state=link src=/usr/local/lib64/libssl.so.1.1 path=/lib64/libssl.so
+  when: version.ssl.find('1.1.') != -1
 
 - name: "show version of openssl"
   command: "{{ ssl.dir }}/bin/openssl version"
@@ -66,4 +72,3 @@
 - name: "debug version of openssl"
   debug: var=openssl_version.stdout_lines
   when: openssl_version is succeeded
-  

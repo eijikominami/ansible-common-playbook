@@ -1,7 +1,7 @@
 # /common_playbook/roles/vsftpd/tasks
 
 - name: "install the latest version of vsftpd, ftp"
-  dnf: name={{ packages }} state=latest
+  yum: name={{ packages }} state=latest
   vars:
     packages:
       - vsftpd
