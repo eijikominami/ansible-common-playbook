@@ -3,7 +3,7 @@
 # ATTENTION ########################
 # 以下の値は、各プロジェクトごとに指定すること
 #
-# {{ ssl.bin }}
+# {{ ssl.dir }}
 # {{ version.python }}
 # {{ version.pythonshort}}
 #
@@ -35,7 +35,7 @@
   unarchive: remote_src=yes src=/tmp/Python-{{ version.python }}.tgz dest=/usr/local/src
 
 - name: "configure python programs"
-  command: chdir=/usr/local/src/Python-{{ version.python }} ./configure -with-openssl={{ssl.bin}}
+  command: chdir=/usr/local/src/Python-{{ version.python }} ./configure -with-openssl={{ssl.dir}}
 
 - name: "make python programs"
   make: chdir=/usr/local/src/Python-{{ version.python }}
