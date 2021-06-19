@@ -43,13 +43,19 @@
   lineinfile: path={{ ssl.so_lib_dir }} line="{{ ssl.dir }}/lib" backup=yes
   when: version.ssl.find('1.1.') == -1
 
-- name: "add ssl library location in {{ ssl.so_lib_dir }}"
-  lineinfile: path={{ ssl.so_lib_dir }} line="/usr/local/lib64" backup=yes
-  when: version.ssl.find('1.1.') != -1
-
 # 共通ライブラリの再読み込みを行う
 - name: "configure dynamic linker run time bindings"
   command: ldconfig
+  when: version.ssl.find('1.1.') == -1
+
+# /lib64 にシンボリックリンクを作成
+- name: "copy library files to /lib64"
+  file: state=link src=/usr/local/lib64/libcrypto.so.1.1　dest=/lib64/libcrypto.so
+  when: version.ssl.find('1.1.') != -1
+
+- name: "copy library files to /lib64"
+  file: state=link src=/usr/local/lib64/libssl.so.1.1　dest=/lib64/libssl.so
+  when: version.ssl.find('1.1.') != -1
 
 - name: "show version of openssl"
   command: "{{ ssl.dir }}/bin/openssl version"
@@ -66,4 +72,3 @@
 - name: "debug version of openssl"
   debug: var=openssl_version.stdout_lines
   when: openssl_version is succeeded
-  
