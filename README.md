@@ -179,7 +179,6 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 | 変数名 | 型 | 内容 | デフォルト値 |
 | ---- | ---- | ---- | ---- |
-| **version.mariadb** | String | mariadbのバージョン名 | defaultsに指定の値 |
 | mariadb.table_open_cache | String | 開いたままにするファイル数 | 400 |
 | mariadb.query_cache_size | String | クエリ結果をキャッシュするために割り当てられたメモリーの量 | 0M |
 | mariadb.wait_timeout | String | 非インタラクティブな接続を閉じる前に、サーバーがその接続上でアクティビティーを待機する秒数 | 28800sec |
