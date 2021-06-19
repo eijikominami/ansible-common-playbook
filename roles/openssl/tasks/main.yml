@@ -49,12 +49,12 @@
   when: version.ssl.find('1.1.') == -1
 
 # /lib64 にシンボリックリンクを作成
-- name: "copy library files to /lib64"
-  file: state=link src=/usr/local/lib64/libcrypto.so.1.1　path=/lib64/libcrypto.so
+- name: "create a symbolic link of libcrypto.so"
+  file: state=link src=/usr/local/lib64/libcrypto.so.1.1 path=/lib64/libcrypto.so
   when: version.ssl.find('1.1.') != -1
 
-- name: "copy library files to /lib64"
-  file: state=link src=/usr/local/lib64/libssl.so.1.1　path=/lib64/libssl.so
+- name: "create a symbolic link of libssl.so"
+  file: state=link src=/usr/local/lib64/libssl.so.1.1 path=/lib64/libssl.so
   when: version.ssl.find('1.1.') != -1
 
 - name: "show version of openssl"
