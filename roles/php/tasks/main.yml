@@ -101,7 +101,7 @@
     backup: yes
     block: |
       <FilesMatch "\.php$">
-         AddHandler php7-script .php
+         AddHandler php-script .php
          AddType application/x-httpd-php .php
       </FilesMatch>
 
