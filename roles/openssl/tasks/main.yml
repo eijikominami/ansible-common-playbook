@@ -39,8 +39,12 @@
   command: make install chdir=/usr/local/src/openssl-{{ version.ssl }}
 
 # 共通ライブラリにSSLライブラリのパスを追加する
-- name: "add ssl library location in {{ ssl.so_lib_dir }}"
+- name: "add ssl library location (lib) in {{ ssl.so_lib_dir }}"
   lineinfile: path={{ ssl.so_lib_dir }} line="{{ ssl.dir }}/lib" backup=yes
+  when: version.ssl.find('1.1.') == -1
+
+- name: "add ssl library location (lib64) in {{ ssl.so_lib_dir }}"
+  lineinfile: path={{ ssl.so_lib_dir }} line="{{ ssl.dir }}/lib64" backup=yes
   when: version.ssl.find('1.1.') == -1
 
 # 共通ライブラリの再読み込みを行う
