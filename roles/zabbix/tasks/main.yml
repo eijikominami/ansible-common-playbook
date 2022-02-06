@@ -97,7 +97,7 @@
 # rootユーザで実行するcpコマンドは"cp -i"のエイリアス
 # そのまま実行すると確認表示が出てしまうためフルパス(/bin/cp)で実行
 - name: "copy zabbix php file"
-  shell: "/bin/cp -R /usr/local/src/zabbix-{{ version.zabbix }}/frontends/php/* {{ zabbix.dir }}"
+  shell: "/bin/cp -R /usr/local/src/zabbix-{{ version.zabbix }}/ui/* {{ zabbix.dir }}"
 
 - name: "change owner of zabbix contents directory"
   file: path="{{ zabbix.dir }}" state=directory owner=zabbix group=zabbix recurse=yes
