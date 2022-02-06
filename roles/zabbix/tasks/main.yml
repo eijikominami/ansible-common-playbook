@@ -41,7 +41,7 @@
 # Raspberry Piはarmv7(armhfp)アーキテクチャ
 # パッケージはx86_64のみなのでソースからコンパイルする
 - name: "download Zabbix source files"
-  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} validate_certs=no url="{{ zabbix.source_url }}&ts={{ ansible_date_time.epoch }}"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} validate_certs=no url="{{ zabbix.source_url }}"
 
 - name: "unpack Zabbix source files"
   unarchive: remote_src=yes src=/tmp/zabbix-{{ version.zabbix }}.tar.gz dest=/usr/local/src
