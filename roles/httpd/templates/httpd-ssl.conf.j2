@@ -89,7 +89,7 @@ SSLPassPhraseDialog  builtin
 #   Configure the SSL Session Cache: First the mechanism 
 #   to use and second the expiring timeout (in seconds).
 #SSLSessionCache         "dbm:/usr/local/apache2/logs/ssl_scache"
-SSLSessionCache        "shmcb:/usr/local/apache2/logs/ssl_scache(512000)"
+SSLSessionCache        "shmcb:{{ httpd.log }}/ssl_scache(512000)"
 SSLSessionCacheTimeout  300
 
 #   OCSP Stapling (requires OpenSSL 0.9.8h or later)
@@ -124,8 +124,8 @@ SSLSessionCacheTimeout  300
 DocumentRoot "/usr/local/apache2/htdocs"
 ServerName {{ ansible_hostname }}:443
 ServerAdmin {{ httpd.server_admin }}
-ErrorLog "/usr/local/apache2/logs/error_log"
-TransferLog "/usr/local/apache2/logs/access_log"
+ErrorLog "{{ httpd.log }}/error_log"
+TransferLog "{{ httpd.log }}/access_log"
 
 #   SSL Engine Switch:
 #   Enable/Disable SSL for this virtual host.
@@ -284,7 +284,7 @@ BrowserMatch "MSIE [2-5]" \
 #   Per-Server Logging:
 #   The home of a custom SSL log file. Use this when you want a
 #   compact non-error SSL logfile on a virtual host basis.
-CustomLog "/usr/local/apache2/logs/ssl_request_log" \
+CustomLog "{{ httpd.log }}//ssl_request_log" \
           "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
 
 </VirtualHost>                                  

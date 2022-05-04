@@ -22,7 +22,7 @@
 # {{ ssl.dir }}
 #
 # SSLの証明書やキーを配置する場合は、
-# /tmpに必要なファイルを事前に設置しておくこと
+# httpd.ssl_cert_file や httpd.ssl_key_file に必要なファイルを事前に設置しておくこと
 ####################################
 
 # pcre-devel	: Perl 5 互換の正規表現をC言語で実装したライブラリ	-> Apacheのコンパイルに使用
@@ -164,25 +164,25 @@
   template: src=httpd-ssl.conf.j2 dest="{{ httpd.ssl_conf }}" backup=yes
   when: httpd.ssl_enabled
 
-# SSL証明書を配置
+# SSL証明書の存在を確認
 - name: "check server.crt file stat"
-  stat: path={{ httpd.conf_dir }}/server.crt
+  stat: path={{ httpd.ssl_cert_file }}
   register: crt_stat
   when: httpd.ssl_enabled
 
 - name: "check server.key file stat"
-  stat: path={{ httpd.conf_dir }}/server.key
+  stat: path={{ httpd.ssl_key_file }}
   register: key_stat
   when: httpd.ssl_enabled
 
-# ファイルが存在しない場合に実行
+# ファイルが存在する場合に実行
 - name: "copy server.crt file"
-  copy: src=/tmp/server.crt dest="{{ httpd.conf_dir }}/server.crt" mode=0400
-  when: httpd.ssl_enabled and not crt_stat.stat.exists
+  copy: src={{ httpd.ssl_cert_file }} dest="{{ httpd.conf_dir }}/server.crt" mode=0400
+  when: httpd.ssl_enabled and crt_stat.stat.exists
 
 - name: "copy server.key file"
-  copy: src=/tmp/server.key dest="{{ httpd.conf_dir }}/server.key" mode=0400
-  when: httpd.ssl_enabled and not key_stat.stat.exists
+  copy: src={{ httpd.ssl_key_file }} dest="{{ httpd.conf_dir }}/server.key" mode=0400
+  when: httpd.ssl_enabled and key_stat.stat.exists
 
 - name: "add apachectl script in rc.local"
   lineinfile: 

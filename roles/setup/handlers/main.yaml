@@ -1,0 +1,4 @@
+# /common_playbook/roles/setup/handlers
+
+- name: restart systemd-journald
+  service: name=systemd-journald state=restarted

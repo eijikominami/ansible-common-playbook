@@ -3,10 +3,10 @@
 elasticsearch:
   repo_url: https://artifacts.elastic.co/packages/5.x/yum
   repo_key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
-  conf: /etc/elasticsearch/elasticsearch.yml
+  conf: /etc/elasticsearch/elasticsearch.yaml
   port: 9200
   kibana_port: 5601
-  kibana_conf: /etc/kibana/kibana.yml
+  kibana_conf: /etc/kibana/kibana.yaml
 httpd:
   compile_from_src: false
   ctlbin: /usr/local/apache2/bin/apachectl

@@ -8,6 +8,7 @@ php:
   configure_options: --enable-mbstring --with-apxs2=/usr/bin/apxs --with-config-file-path=/etc --disable-libxml --disable-xmlwriter --disable-xmlreader --disable-simplexml --disable-xml --disable-dom --without-pear
   extensiondir: /usr/lib64/php/modules
   file_uploads_disabled: false
+  max_execution_time: 300
   mysql_enabled: false
   memory_limit: 16M
 httpd:

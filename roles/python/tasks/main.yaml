@@ -46,5 +46,8 @@
 - name: "create a symbolic link of python3"
   file: src=/usr/local/bin/python{{ version.pythonshort }} dest=/usr/bin/python3 state=link
 
-- name: "create a symbolic link of pip3"
-  file: src=/usr/local/bin/pip{{ version.pythonshort }} dest=/usr/bin/pip3 state=link
+- name: "download a pip script file"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ python.pip_url }}"
+
+- name: "configure pip"
+  command: python3 /tmp/get-pip.py

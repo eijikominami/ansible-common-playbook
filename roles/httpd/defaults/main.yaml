@@ -24,6 +24,8 @@ httpd:
   daemon: /usr/local/apache2/bin/httpd
   server_admin: webmaster@apache.org
   ssl_enabled: false
+  ssl_cert_file: /tmp/server.crt
+  ssl_key_file: /tmp/server.key
   pass: password
   timeout: 60
   max_keepalive_requests: 100

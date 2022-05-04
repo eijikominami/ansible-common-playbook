@@ -1,0 +1,10 @@
+# /common_playbook/roles/python/defaults
+
+version:
+  python: 3.9.1
+  pythonshort: 3.9
+ssl:
+  dir: /usr/local/ssl
+python:
+  source_url: https://www.python.org/ftp/python/{{ version.python }}/Python-{{ version.python }}.tgz
+  pip_url: https://bootstrap.pypa.io/get-pip.py

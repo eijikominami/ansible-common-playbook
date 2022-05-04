@@ -79,6 +79,8 @@
        ; 実行ディレクトリ以外のphpが動かなくなる
        ;open_basedir = 
        extension_dir = /usr/lib64/php/modules
+       ; タイムアウト
+       max_execution_time = {{ php.max_execution_time }}
 
 # PHPバージョンを表示しない
 - name: "disable expose_php in {{ php.ini }}"

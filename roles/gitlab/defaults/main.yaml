@@ -6,7 +6,7 @@ gitlab:
   repo_key: https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
   script: script.rpm.sh
   conf: /etc/gitlab/gitlab.rb
-  erb: /opt/gitlab/embedded/cookbooks/gitlab/templates/default/gitlab.yml.erb
+  erb: /opt/gitlab/embedded/cookbooks/gitlab/templates/default/gitlab.yaml.erb
   email_from: example@example.com
   email_display_name: Example
   unicorn_port: 8888

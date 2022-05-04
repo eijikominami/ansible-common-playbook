@@ -4,7 +4,7 @@
   yum: name=python-sphinx state=latest enablerepo=epel
 
 - name: "install the latest version of commonmark, recommonmark, sphinx_rtd_theme, sphinx_bootstrap_theme"
-  pip: name={{ packages }} state=latest
+  pip: name={{ packages }} executable=pip3 state=latest
   vars:
     packages:
       - commonmark

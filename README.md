@@ -85,8 +85,8 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 | ファイル | ディレクトリ |
 | --- | --- |
-| 秘密鍵 | /tmp/server.key |
-| 証明書 | /tmp/server.crt |
+| 証明書 | /tmp/server.crt もしくは httpd.ssl_cert_file にて指定した位置 |
+| 秘密鍵 | /tmp/server.key　もしくは httpd.ssl_key_file にて指定した位置 |
 
 ### 静的モジュール
 - 有効化している静的モジュールは以下の通りです。

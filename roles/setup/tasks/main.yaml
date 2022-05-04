@@ -50,7 +50,7 @@
 
 # expactモジュールの利用に必要
 - name: "install pexpect package"
-  pip: name=pexpect
+  pip: name=pexpect executable=pip3 state=latest
 
 - name: "stop service iptables"
   service: name={{ item }} enabled=no state=stopped
@@ -83,3 +83,12 @@
 
 - name: "set timezone to Asia/Tokyo"
   timezone: name=Asia/Tokyo
+
+# journald.conf
+- name: "add a block to /etc/systemd/journald.conf if it does not exist"
+  blockinfile:
+    path: /etc/systemd/journald.conf
+    backup: yes
+    block: |
+      MaxRetentionSec=7day
+  notify: restart systemd-journald

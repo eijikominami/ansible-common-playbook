@@ -14,6 +14,7 @@
     packages:
       - gcc
       - zlib-devel
+      - perl-IPC-Cmd
 
 - name: "delete existing openssl source files"
   file: path=/usr/local/src/openssl-{{ version.ssl }} state=absent
@@ -40,11 +41,11 @@
 
 # /lib64 にシンボリックリンクを作成
 - name: "create a symbolic link of libcrypto.so"
-  file: state=link src=/usr/local/lib64/libcrypto.so.1.1 path=/lib64/libcrypto.so
+  file: state=link src={{ ssl.dir }}/lib/libcrypto.so path=/lib64/libcrypto.so
   when: version.ssl.find('1.1.') != -1
 
 - name: "create a symbolic link of libssl.so"
-  file: state=link src=/usr/local/lib64/libssl.so.1.1 path=/lib64/libssl.so
+  file: state=link src={{ ssl.dir }}/lib/libssl.so path=/lib64/libssl.so
   when: version.ssl.find('1.1.') != -1
 
 # 共通ライブラリにSSLライブラリのパスを追加する
