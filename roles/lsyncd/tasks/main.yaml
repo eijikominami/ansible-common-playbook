@@ -104,3 +104,6 @@
 # 監視可能なファイル数の上限を設定
 - name: "set fs.inotify.max_user_watches to {{ lsyncd.inotify_max_user }} in /etc/sysctl.conf"
   sysctl: name=fs.inotify.max_user_watches value={{ lsyncd.inotify_max_user }}
+
+- name: "delete the source files"
+  file: path=/usr/local/src/lsyncd-master state=absent

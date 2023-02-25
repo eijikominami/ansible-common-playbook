@@ -122,3 +122,6 @@
 
 - name: "edit LogFile location in {{ zabbix.conf }}"
   replace: path="{{ zabbix.conf }}" regexp='^LogFile=.*$' replace="LogFile={{ zabbix.log_dir }}/zabbix_server.log" backup=yes
+
+  - name: "delete the source files"
+  file: path=/usr/local/src/zabbix-{{ version.zabbix }} state=absent

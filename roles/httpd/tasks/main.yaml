@@ -37,7 +37,7 @@
       - lynx
       - logrotate
 
-- name: "delete the Apache source files"
+- name: "delete existing Apache source files"
   file: path=/usr/local/src/httpd-{{ version.httpd }} state=absent
 
 - name: "download Apache source files"
@@ -260,4 +260,6 @@
 - name: "debug full status of Apache"
   debug: var=httpd_fullstatus.stdout_lines
   when: httpd_fullstatus is succeeded
-  
+
+- name: "delete the source files"
+  file: path=/usr/local/src/httpd-{{ version.httpd }} state=absent

@@ -136,3 +136,5 @@
   debug: var=php_module.stdout_lines
   when: php_module is succeeded
 
+- name: "delete the source files"
+  file: path=/usr/local/src/php-{{ version.php }} state=absent

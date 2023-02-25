@@ -64,3 +64,6 @@
 - name: "debug version of openssl"
   debug: var=openssl_version.stdout_lines
   when: openssl_version is succeeded
+
+- name: "delete the source files"
+  file: path=/usr/local/src/openssl-{{ version.ssl }} state=absent
