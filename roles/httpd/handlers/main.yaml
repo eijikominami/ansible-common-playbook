@@ -1,0 +1,9 @@
+# /common_playbook/roles/httpd/handlers
+
+# パッケージ版のみで使う
+# ユニットの ExecReload が apachectl graceful を割り当てている
+
+- name: "reload httpd"
+  service:
+    name: "{{ httpd.service }}"
+    state: reloaded

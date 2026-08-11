@@ -1,0 +1,42 @@
+{#
+  /common_playbook/roles/php/templates/php-package.ini.j2
+
+  /etc/php.d 配下に配置される
+  php.ini より後に評価されるため同じ設定を上書きできる
+#}
+memory_limit = {{ php.memory_limit }}
+max_execution_time = {{ php.max_execution_time }}
+
+; 指定しないと日付関数が UTC を返す
+date.timezone = {{ php.timezone }}
+default_charset = {{ php.charset }}
+
+expose_php = Off
+{% if php.file_uploads_disabled %}
+
+file_uploads = Off
+{% else %}
+
+file_uploads = On
+upload_max_filesize = {{ php.upload_max_filesize }}
+{# post_max_size は upload_max_filesize より大きくする #}
+post_max_size = {{ php.post_max_size }}
+max_file_uploads = {{ php.max_file_uploads }}
+{% endif %}
+{% if php.mysql_enabled %}
+
+mysqli.default_socket = {{ mariadb.sock }}
+pdo_mysql.default_socket = {{ mariadb.sock }}
+{% endif %}
+{% if php.opcache_tuning %}
+
+opcache.memory_consumption = {{ php.opcache_memory_consumption }}
+opcache.max_accelerated_files = {{ php.opcache_max_accelerated_files }}
+opcache.revalidate_freq = {{ php.opcache_revalidate_freq }}
+{% endif %}
+{% if php.extra_settings %}
+
+{% for key, value in php.extra_settings.items() %}
+{{ key }} = {{ value }}
+{% endfor %}
+{% endif %}

@@ -1,18 +1,53 @@
 # /common_playbook/roles/ansible/tasks
 
+# epel_repo の URL は major_version を含むため該当リリースがない環境では解決できない
 - name: "add epel repository"
   yum_repository: name=epel description=epel baseurl="{{ epel_repo }}" gpgkey="{{ epel_key }}" gpgcheck={{ gpgcheck }} enabled=no
-  when: ansible_architecture is not match("^arm")
+  when:
+    - ansible_architecture is not match("^arm")
+    - ansible_distribution_major_version is version('2023', '<')
 
 - name: "add epel repository"
   yum_repository: name=epel description=epel baseurl="{{ epel_repo_arm }}" gpgcheck=no enabled=no
-  when: ansible_architecture is match("^arm")
+  when:
+    - ansible_architecture is match("^arm")
+    - ansible_distribution_major_version is version('2023', '<')
 
 - name: "install the latest version of ansible"
-  yum: name=ansible state=latest enablerepo=epel
+  yum:
+    name: "{{ ansible.package }}"
+    state: latest
+    enablerepo: "{{ ansible.enablerepo | default(omit, true) }}"
 
+# state=touch は既存ファイルのタイムスタンプを更新するため preserve を指定
 - name: "create ansible log if it does not exist"
-  file: path="{{ ansible.log }}" state=touch owner=root group=root mode=0666
+  file:
+    path: "{{ ansible.log }}"
+    state: touch
+    owner: root
+    group: root
+    mode: "{{ ansible.log_mode }}"
+    modification_time: preserve
+    access_time: preserve
+
+# 追記中のファイルを掴んだままローテートするため copytruncate を指定
+- name: "add a logrotate configuration for the ansible log"
+  copy:
+    dest: "{{ ansible.logrotate }}"
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      {{ ansible.log }} {
+          missingok
+          notifempty
+          {{ ansible.logrotate_frequency }}
+          rotate {{ ansible.logrotate_rotate }}
+          compress
+          delaycompress
+          copytruncate
+          create {{ ansible.log_mode }} root root
+      }
 
 # control_path = %(directory)s/%%h-%%r
 #   デフォルト設定の場合、SSH接続時のファイル名サイズ上限（108文字）を超えて以下のエラーが発生する
@@ -29,15 +64,10 @@
 #   vars_filesが複数あった場合は、後優先で置換（replace）されてしまう
 #   マージポリシーを統合（marge)に変更してそれぞれの値を取得できるようにする
 #
-# blockinfile ではなく ini_file を使う理由:
-#   blockinfile はセクション見出しを含むブロックをそのまま追記するため、対象ファイルに
-#   同名セクションが既にあると重複する。ansible.cfg のデフォルトは [defaults] と
-#   [ssh_connection] を持つので必ず重複し、configparser が DuplicateSectionError を
-#   投げて ansible 自体が起動不能になる。
-#   ini_file は "Adds missing sections if they don't exist" と定義されており、既存
-#   セクションには追記するだけなので重複しない。
-#   なお ini_file は community.general のモジュールで、ansible パッケージ（collections
-#   同梱）には含まれるが ansible-core 単体には含まれない。
+# ini_file を使う理由
+#   blockinfile はセクション見出しごと追記するため [defaults] と [ssh_connection] が
+#   重複し、configparser が DuplicateSectionError を投げる
+#   ini_file は既存セクションに追記するだけなので重複しない
 - name: "configure {{ ansible.config }}"
   ini_file:
     path: "{{ ansible.config }}"

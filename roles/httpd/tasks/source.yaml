@@ -1,0 +1,265 @@
+# /common_playbook/roles/httpd/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+#
+# {{ version.httpd }}
+# {{ version.apr }}
+# {{ version.apr_util }}
+# {{ httpd.server_admin }}
+# {{ httpd.ssl_enabled }}
+# {{ httpd.pass }}
+# {{ httpd.start_servers }}
+# {{ httpd.timeout }}
+# {{ httpd.max_keepalive_requests }}
+# {{ httpd.keepalive_timeout }}
+# {{ httpd.min_spare_servers }}
+# {{ httpd.max_spare_servers }}
+# {{ httpd.max_request_workers }}
+# {{ httpd.server_limit }}
+# {{ httpd.max_connections_per_child }}
+# {{ httpd.cros }}
+# {{ ssl.dir }}
+#
+# SSLの証明書やキーを配置する場合は、
+# httpd.ssl_cert_file や httpd.ssl_key_file に必要なファイルを事前に設置しておくこと
+####################################
+
+# pcre-devel	: Perl 5 互換の正規表現をC言語で実装したライブラリ	-> Apacheのコンパイルに使用
+# expat-devel	: Perl 5 互換の正規表現をC言語で実装したライブラリ	-> Apacheのコンパイルに使用
+# lynx			: テキストベースブラウザ							-> Apache Statusの確認に使用
+- name: "install the latest version of pcre-devel, lynx, logrotate"
+  yum: name={{ packages }} state=latest
+  vars:
+    packages:
+      - pcre-devel
+      - expat-devel
+      - lynx
+      - logrotate
+
+- name: "delete existing Apache source files"
+  file: path=/usr/local/src/httpd-{{ version.httpd }} state=absent
+
+- name: "download Apache source files"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ httpd.source_url }}"
+
+- name: "download APR source files"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ apr.source_url }}"
+
+- name: "download APR Util source files"
+  get_url: dest=/tmp force=yes timeout={{ get_url_timeout }} url="{{ apr_util.source_url }}"
+
+- name: "unpack Apache source files"
+  unarchive: remote_src=yes src=/tmp/httpd-{{ version.httpd }}.tar.gz dest=/usr/local/src
+
+- name: "unpack APR source files"
+  unarchive: remote_src=yes src=/tmp/apr-{{ version.apr }}.tar.gz dest=/usr/local/src/httpd-{{ version.httpd }}/srclib/
+
+- name: "unpack APR Util source files"
+  unarchive: remote_src=yes src=/tmp/apr-util-{{ version.apr_util }}.tar.gz dest=/usr/local/src/httpd-{{ version.httpd }}/srclib/
+
+- name: "move apr-{{ version.apr }} to apr"
+  command: mv -f /usr/local/src/httpd-{{ version.httpd }}/srclib/apr-{{ version.apr }} /usr/local/src/httpd-{{ version.httpd }}/srclib/apr
+
+- name: "move apr-util-{{ version.apr_util }} to apr-util"
+  command: mv -f /usr/local/src/httpd-{{ version.httpd }}/srclib/apr-util-{{ version.apr_util }} /usr/local/src/httpd-{{ version.httpd }}/srclib/apr-util
+
+# apache 2.4 configure options
+# http://httpd.apache.org/docs/2.4/programs/configure.html
+#
+# --enable-so						: DSO capability. This module will be automatically
+# --enable-mpms-shared=all          : Enable a list of MPMs as dynamic shared modules. (the default MPM is event.)
+# --enable-mods-shared=most         : Defines a list of modules to be enabled and build as dynamic shared modules. (The default set is most.)
+# --enable-auth_digest=static       : User authentication using MD5 Digest Authentication (linked statically)
+# --enable-proxy=static             : Multi-protocol proxy/gateway server (linked statically)
+# --enable-proxy_fcgi=static        : FastCGI support module for mod_proxy (linked statically)
+# --enable-ssl						: SSL/TLS support (mod_ssl)
+# --with-ssl=PATH					: OpenSSL installation directory
+# --disable-autoindex				: disable the autoindex module
+# --disable-version					: turn off server signature
+# --disable-filter					: disable the filter module
+
+- name: "configure Apache programs (SSL enabled)"
+  command: chdir=/usr/local/src/httpd-{{ version.httpd }} ./configure --enable-mpms-shared=all --enable-auth_digest=static --enable-so --enable-ssl --with-ssl={{ ssl.dir }} --disable-autoindex --disable-version --disable-filter  
+  when: httpd.ssl_enabled
+
+- name: "configure Apache programs (SSL disabled)"
+  command: chdir=/usr/local/src/httpd-{{ version.httpd }} ./configure --enable-mpms-shared=all --enable-auth_digest=static --enable-so --disable-autoindex --disable-version --disable-filter  
+  when: not httpd.ssl_enabled
+
+- name: "make Apache programs"
+  make: chdir=/usr/local/src/httpd-{{ version.httpd }}
+
+- name: "install Apache programs"
+  make: chdir=/usr/local/src/httpd-{{ version.httpd }} target=install
+
+- name: "create apache log file directory"
+  file: path="{{ httpd.log }}" state=directory owner=root group=root mode=0755
+
+- name: "create htdigest file directory"
+  file: path="{{ httpd.htdigest }}" state=directory owner=root group=root mode=0755
+
+# change httpd.conf
+# 
+# [enable SSL]
+# use 'httpd.conf-ssl.j2' template
+# ssl_module requires socache_shmcb_module and setenvif_module
+#
+# [disable SSL]
+# use 'httpd.conf-nossl.j2' template
+#
+# 1. set Server Name
+# ServerName {{ ansible_hostname }}
+#
+# 2. disable Indexes FollowSymLinks
+# #Options Indexes FollowSymLinks
+#
+# 3. change ErrorLog directory
+# ErrorLog "/var/apache/logs/error_log"
+#
+# 4. change CustomLog directory
+# CustomLog "/var/apache/logs/access_log" common
+#
+# 5. include httpd-default.conf
+# Include conf/extra/httpd-default.conf
+#
+# 6. include httpd-mpm.conf
+# Include conf/extra/httpd-mpm.conf
+#
+- name: "put a apache config file (SSL enabled) if it does not exist"
+  template: src=httpd.conf-ssl.j2 dest="{{ httpd.conf }}" backup=yes
+  when: httpd.ssl_enabled
+
+- name: "put a apache config file (SSL disabled) if it does not exist"
+  template: src=httpd.conf-nossl.j2 dest="{{ httpd.conf }}" backup=yes
+  when: not httpd.ssl_enabled
+
+# change httpd-default.conf
+#
+# 1. set Timeout 30
+# 2. set KeepAliveTimeout 2
+#
+- name: "put a apache default config file if it does not exist"
+  template: src=httpd-default.conf.j2 dest="{{ httpd.default_conf }}" backup=yes
+    
+# change httpd-mpm.conf
+#
+# 1. set prefork MPM
+#
+- name: "put a apache default config file if it does not exist"
+  template: src=httpd-mpm.conf.j2 dest="{{ httpd.mpm_conf }}" backup=yes
+
+# change httpd-info.conf
+#
+# 1. allow to access from localhost
+#
+- name: "put a apache info config file if it does not exist"
+  template: src=httpd-info.conf.j2 dest="{{ httpd.info_conf }}" backup=yes
+
+# change httpd-ssl.conf
+#
+# 1. allow to access from localhost
+#
+- name: "put a apache ssl config file if it does not exist"
+  template: src=httpd-ssl.conf.j2 dest="{{ httpd.ssl_conf }}" backup=yes
+  when: httpd.ssl_enabled
+
+# SSL証明書の存在を確認
+- name: "check server.crt file stat"
+  stat: path={{ httpd.ssl_cert_file }}
+  register: crt_stat
+  when: httpd.ssl_enabled
+
+- name: "check server.key file stat"
+  stat: path={{ httpd.ssl_key_file }}
+  register: key_stat
+  when: httpd.ssl_enabled
+
+# ファイルが存在する場合に実行
+- name: "copy server.crt file"
+  copy: src={{ httpd.ssl_cert_file }} dest="{{ httpd.conf_dir }}/server.crt" mode=0400
+  when: httpd.ssl_enabled and crt_stat.stat.exists
+
+- name: "copy server.key file"
+  copy: src={{ httpd.ssl_key_file }} dest="{{ httpd.conf_dir }}/server.key" mode=0400
+  when: httpd.ssl_enabled and key_stat.stat.exists
+
+- name: "add apachectl script in rc.local"
+  lineinfile: 
+     path: /etc/rc.local
+     line: "{{ httpd.ctlbin }} start"
+     backup: yes
+
+# Apacheセキュリティ
+# Apacheディレクトリの権限設定
+#
+# Ansible Fileモジュールのバグにより暫定的にCommandモジュールによって記述
+# https://github.com/ansible/ansible/issues/23861
+- name: "remove write permissions from {{ httpd.base_dir }}"
+  command: "chmod -R go-w {{ httpd.base_dir }}"
+
+- name: "remove read permissions from {{ httpd.conf_dir }}"
+  command: "chmod -R go-r {{ httpd.conf_dir }}"
+
+- name: "remove read permissions from {{ httpd.log }}"
+  command: "chmod -R go-r {{ httpd.log }}"
+
+# Apacheセキュリティ
+# デフォルトコンテンツの削除
+- name: "delete default contents ({{ httpd.cgibin }})"
+  file: path={{ httpd.cgibin }} state=absent
+
+- name: "delete default contents ({{ httpd.manual }})"
+  file: path={{ httpd.manual }} state=absent
+
+# 古いApacheプロセスを強制削除
+- name: "kill existing Apache processes"
+  command: "pkill -f {{ httpd.daemon }}"
+  ignore_errors: yes
+
+# パーミッション644を指定しないとエラーで実行されない
+- name: "add a {{ httpd.logrotate }} if it does not exist"
+  copy: src=httpd dest={{ httpd.logrotate }} owner=root group=root mode=0644
+
+# Apacheセキュリティ
+# Apacheの起動のみに使用するユーザを作成
+# Apache起動中だと変更できない
+- name: "add the group '{{ httpd.user }}'"
+  group: name={{ httpd.user }}
+
+- name: "add the user '{{ httpd.user }}'"
+  user: name={{ httpd.user }} password={{ httpd.pass | password_hash('sha512') }} groups={{ httpd.user }} shell=/sbin/nologin createhome=no home=/dev/null
+
+# Apacheを起動
+- name: "start service apachectl"
+  command: "{{ httpd.ctlbin }} start"
+
+- name: "show version number of Apache"
+  command: "{{ httpd.ctlbin }} -v"
+  register: httpd_version
+  changed_when: false
+
+- name: "debug version number of Apache"
+  debug: var=httpd_version.stdout_lines
+  when: httpd_version is succeeded
+
+- name: "show all loaded modules of Apache"
+  command: "{{ httpd.ctlbin }} -M"
+  register: httpd_module
+  changed_when: false
+
+- name: "debug all loaded modules of Apache"
+  debug: var=httpd_module.stdout_lines
+  when: httpd_module is succeeded
+
+- name: "show full status of Apache"
+  command: "{{ httpd.ctlbin }} fullstatus"
+  register: httpd_fullstatus
+  changed_when: false
+
+- name: "debug full status of Apache"
+  debug: var=httpd_fullstatus.stdout_lines
+  when: httpd_fullstatus is succeeded
+
+- name: "delete the source files"
+  file: path=/usr/local/src/httpd-{{ version.httpd }} state=absent

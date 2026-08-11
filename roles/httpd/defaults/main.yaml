@@ -37,6 +37,50 @@ httpd:
   server_limit: 256
   max_connections_per_child: 0
   cros: null
+
+  # true の場合はソースからビルドする
+  # 既定を true にしているのは既存プロジェクトの挙動を変えないため
+  compile_from_src: true
+
+  # 以下は compile_from_src が false のときのみ使う
+
+  # RHEL 系のパッケージ名
+  packages:
+    - httpd
+    - httpd-tools
+    - mod_ssl
+
+  # 追加設定の置き場
+  conf_d: /etc/httpd/conf.d
+
+  service: httpd
+
+  # 内容を空にするパッケージ同梱の設定
+  # autoindex.conf は /icons/ を、welcome.conf は /poweredby.png を公開する
+  neutralized_conf:
+    - autoindex.conf
+    - welcome.conf
+    - userdir.conf
+
+  # mod_ssl が置く設定ファイル名
+  # role が内容を差し替える
+  ssl_conf_filename: ssl.conf
+
+  # PROFILE=SYSTEM は OS の crypto-policies に従う
+  ssl_protocol: "-all +TLSv1.2 +TLSv1.3"
+  ssl_cipher_suite: "PROFILE=SYSTEM"
+
+  # event と worker MPM で使うスレッド系の値
+  min_spare_threads: 25
+  max_spare_threads: 75
+  threads_per_child: 25
+  max_mem_free: 2048
+
+  # null の場合は ansible_hostname を使う
+  server_name: null
+
+  # .htaccess を使う場合は All を指定
+  allow_override: None
 apr:
   source_url: http://ftp.jaist.ac.jp/pub/apache//apr/apr-{{ version.apr }}.tar.gz
 apr_util:

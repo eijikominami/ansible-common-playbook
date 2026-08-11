@@ -1,0 +1,55 @@
+{#
+  /common_playbook/roles/httpd/templates/httpd-package-base.conf.j2
+
+  conf.d/00-base.conf として配置される
+  conf.d は httpd.conf の後に読まれるため既定値を上書きできる
+#}
+# 明示しないと既定の Full が効き OS 名まで応答に載る
+ServerTokens Prod
+ServerSignature Off
+
+# TRACE は既定で有効
+TraceEnable Off
+
+ServerAdmin {{ httpd.server_admin }}
+{% if httpd.server_name is defined and httpd.server_name %}
+ServerName {{ httpd.server_name }}
+{% else %}
+ServerName {{ ansible_hostname }}
+{% endif %}
+
+Timeout {{ httpd.timeout }}
+KeepAlive On
+MaxKeepAliveRequests {{ httpd.max_keepalive_requests }}
+KeepAliveTimeout {{ httpd.keepalive_timeout }}
+
+UseCanonicalName Off
+HostnameLookups Off
+AccessFileName .htaccess
+
+# 低速なリクエストでワーカーを占有させない
+<IfModule reqtimeout_module>
+    RequestReadTimeout header=20-40,MinRate=500 body=20,MinRate=500
+</IfModule>
+
+{# httpd.conf の <Directory> は Options Indexes を持つため上書きする #}
+<Directory "{{ httpd.doc_root }}">
+    Options -Indexes +FollowSymLinks
+    AllowOverride {{ httpd.allow_override | default('None') }}
+    Require all granted
+</Directory>
+
+# バージョン管理ディレクトリとバックアップファイルの配信を防ぐ
+<DirectoryMatch "/\.(git|svn|hg)/">
+    Require all denied
+</DirectoryMatch>
+
+<FilesMatch "(^\.|~$|\.(bak|orig|save|swp|sql|log)$)">
+    Require all denied
+</FilesMatch>
+{% if httpd.cros %}
+
+<IfModule headers_module>
+    Header set Access-Control-Allow-Origin {{ httpd.cros }}
+</IfModule>
+{% endif %}

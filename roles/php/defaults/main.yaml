@@ -11,5 +11,46 @@ php:
   max_execution_time: 300
   mysql_enabled: false
   memory_limit: 16M
+
+  # true の場合はソースからビルドする
+  # 既定を true にしているのは既存プロジェクトの挙動を変えないため
+  compile_from_src: true
+
+  # 以下は compile_from_src が false のときのみ使う
+
+  # 版数を名前に含むディストリビューションでは php8.2-* のように指定する
+  packages:
+    - php
+    - php-fpm
+    - php-opcache
+    - php-mbstring
+
+  # 追加の .ini を置く場所
+  conf_d: /etc/php.d
+
+  # 数字が大きいほど後に読まれる
+  ini_filename: 99-ansible.ini
+
+  # PHP 8.2 の mod_php を提供しないディストリビューションがあるため既定で true
+  fpm_enabled: true
+  fpm_service: php-fpm
+
+  # php.ini の既定を上書きする値
+  timezone: Asia/Tokyo
+  charset: UTF-8
+  upload_max_filesize: 2M
+  post_max_size: 8M
+  max_file_uploads: 20
+
+  # opcache はパッケージの既定で有効
+  # 値を変えるときだけ true にする
+  opcache_tuning: false
+  opcache_memory_consumption: 128
+  opcache_max_accelerated_files: 4000
+  opcache_revalidate_freq: 2
+
+  # 上記に当てはまらない設定
+  extra_settings: {}
+
 httpd:
   compile_from_src: true

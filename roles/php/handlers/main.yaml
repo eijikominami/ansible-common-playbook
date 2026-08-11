@@ -1,0 +1,18 @@
+# /common_playbook/roles/php/handlers
+
+# パッケージ版のみで使う
+
+- name: "restart php-fpm"
+  service:
+    name: "{{ php.fpm_service }}"
+    state: restarted
+  when: php.fpm_enabled
+
+# php-fpm の再起動だけでは Apache 側の接続が張り替わらない場合がある
+- name: "reload httpd for php"
+  service:
+    name: "{{ httpd.service }}"
+    state: reloaded
+  when:
+    - php.fpm_enabled
+    - not (httpd.compile_from_src | default(true))

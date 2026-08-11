@@ -3,3 +3,14 @@
 ansible:
   config: /etc/ansible/ansible.cfg
   log: /var/log/ansible.log
+  # ログは root のみ書き込み可
+  log_mode: "0640"
+  # ログの世代管理
+  logrotate: /etc/logrotate.d/ansible
+  logrotate_frequency: weekly
+  logrotate_rotate: 4
+  # community.general を含む ansible を指定すること
+  # ansible-core 単体では ini_file が使えない
+  package: ansible
+  # null の場合は enablerepo を渡さない
+  enablerepo: epel

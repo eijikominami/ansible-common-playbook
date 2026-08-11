@@ -1,0 +1,38 @@
+{#
+  /common_playbook/roles/httpd/templates/httpd-package-mpm.conf.j2
+
+  conf.d/10-mpm.conf として配置される
+  conf.modules.d/00-mpm.conf は LoadModule のみなので重複しない
+  パッケージ版の既定は event MPM
+#}
+<IfModule mpm_event_module>
+    StartServers            {{ httpd.start_servers }}
+    MinSpareThreads         {{ httpd.min_spare_threads }}
+    MaxSpareThreads         {{ httpd.max_spare_threads }}
+    ThreadsPerChild         {{ httpd.threads_per_child }}
+    MaxRequestWorkers       {{ httpd.max_request_workers }}
+    MaxConnectionsPerChild  {{ httpd.max_connections_per_child }}
+    ServerLimit             {{ httpd.server_limit }}
+</IfModule>
+
+<IfModule mpm_worker_module>
+    StartServers            {{ httpd.start_servers }}
+    MinSpareThreads         {{ httpd.min_spare_threads }}
+    MaxSpareThreads         {{ httpd.max_spare_threads }}
+    ThreadsPerChild         {{ httpd.threads_per_child }}
+    MaxRequestWorkers       {{ httpd.max_request_workers }}
+    MaxConnectionsPerChild  {{ httpd.max_connections_per_child }}
+    ServerLimit             {{ httpd.server_limit }}
+</IfModule>
+
+{# prefork は 1 リクエストが 1 プロセスを占有するためプロセス数で制御する #}
+<IfModule mpm_prefork_module>
+    StartServers            {{ httpd.start_servers }}
+    MinSpareServers         {{ httpd.min_spare_servers }}
+    MaxSpareServers         {{ httpd.max_spare_servers }}
+    MaxRequestWorkers       {{ httpd.max_request_workers }}
+    ServerLimit             {{ httpd.server_limit }}
+    MaxConnectionsPerChild  {{ httpd.max_connections_per_child }}
+</IfModule>
+
+MaxMemFree {{ httpd.max_mem_free | default(2048) }}

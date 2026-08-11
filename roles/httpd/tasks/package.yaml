@@ -1,0 +1,169 @@
+# /common_playbook/roles/httpd/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+#
+# {{ httpd.packages }}
+# {{ httpd.conf_d }}
+# {{ httpd.service }}
+# {{ httpd.log }}
+# {{ httpd.htdigest }}
+# {{ httpd.ssl_enabled }}
+# {{ httpd.neutralized_conf }}
+#
+####################################
+
+# 設定は httpd.conf ではなく conf.d に置く
+# logrotate と apache ユーザーはパッケージが用意する
+
+- name: "install the httpd packages"
+  package:
+    name: "{{ httpd.packages }}"
+    state: present
+
+- name: "create the apache log directory"
+  file:
+    path: "{{ httpd.log }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: "create the htdigest directory"
+  file:
+    path: "{{ httpd.htdigest }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+# ServerTokens はパッケージの設定に記述がなく既定の Full が効くため明示する
+- name: "put the base configuration and the hardening directives"
+  template:
+    src: httpd-package-base.conf.j2
+    dest: "{{ httpd.conf_d }}/00-base.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: "reload httpd"
+
+# conf.modules.d/00-mpm.conf は LoadModule のみなので conf.d に置いても重複しない
+- name: "put the MPM tuning"
+  template:
+    src: httpd-package-mpm.conf.j2
+    dest: "{{ httpd.conf_d }}/10-mpm.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: "reload httpd"
+
+- name: "put the server-status configuration"
+  template:
+    src: httpd-info.conf.j2
+    dest: "{{ httpd.conf_d }}/20-info.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: "reload httpd"
+
+# autoindex.conf は /icons/ を、welcome.conf は /poweredby.png を公開する
+# 削除ではなく空にするのはパッケージを入れ直したときに戻るのを避けるため
+- name: "neutralize the configuration files shipped by the packages"
+  copy:
+    content: "# Emptied by Ansible. See 00-base.conf in the same directory.\n"
+    dest: "{{ httpd.conf_d }}/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ httpd.neutralized_conf }}"
+  notify: "reload httpd"
+
+# mod_ssl の ssl.conf は自己署名証明書を参照しており、それがない環境では
+# apachectl -t が失敗する。VirtualHost はプロジェクト側で定義する
+- name: "replace the ssl configuration shipped by mod_ssl"
+  template:
+    src: httpd-package-ssl.conf.j2
+    dest: "{{ httpd.conf_d }}/{{ httpd.ssl_conf_filename }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: httpd.ssl_enabled
+  notify: "reload httpd"
+
+- name: "neutralize the ssl configuration because SSL is disabled"
+  copy:
+    content: "# Emptied by Ansible. SSL is disabled for this host.\n"
+    dest: "{{ httpd.conf_d }}/{{ httpd.ssl_conf_filename }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: not httpd.ssl_enabled
+  notify: "reload httpd"
+
+# SSL証明書の存在を確認
+- name: "check server.crt file stat"
+  stat:
+    path: "{{ httpd.ssl_cert_file }}"
+  register: crt_stat
+  when: httpd.ssl_enabled
+
+- name: "check server.key file stat"
+  stat:
+    path: "{{ httpd.ssl_key_file }}"
+  register: key_stat
+  when: httpd.ssl_enabled
+
+# ファイルが存在する場合に実行
+- name: "copy server.crt file"
+  copy:
+    src: "{{ httpd.ssl_cert_file }}"
+    dest: "{{ httpd.conf_dir }}/server.crt"
+    mode: "0400"
+  when: httpd.ssl_enabled and crt_stat.stat.exists
+  notify: "reload httpd"
+
+- name: "copy server.key file"
+  copy:
+    src: "{{ httpd.ssl_key_file }}"
+    dest: "{{ httpd.conf_dir }}/server.key"
+    mode: "0400"
+  when: httpd.ssl_enabled and key_stat.stat.exists
+  notify: "reload httpd"
+
+# 誤りがあるまま reload すると Apache が停止するため handler の前に検証する
+- name: "validate the configuration before applying it"
+  command: "{{ httpd.ctlbin }} -t"
+  register: httpd_configtest
+  changed_when: false
+
+- name: "debug the configuration test result"
+  debug:
+    var: httpd_configtest.stderr_lines
+  when: httpd_configtest is succeeded
+
+- name: "enable and start the httpd service"
+  service:
+    name: "{{ httpd.service }}"
+    state: started
+    enabled: yes
+
+- name: "show version number of Apache"
+  command: "{{ httpd.ctlbin }} -v"
+  register: httpd_version
+  changed_when: false
+
+- name: "debug version number of Apache"
+  debug:
+    var: httpd_version.stdout_lines
+  when: httpd_version is succeeded
+
+# apachectl は -M を受け付けないため httpd を直接呼ぶ
+- name: "show all loaded modules of Apache"
+  command: "{{ httpd.daemon }} -M"
+  register: httpd_module
+  changed_when: false
+
+- name: "debug all loaded modules of Apache"
+  debug:
+    var: httpd_module.stdout_lines
+  when: httpd_module is succeeded

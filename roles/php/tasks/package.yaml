@@ -1,0 +1,87 @@
+# /common_playbook/roles/php/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+#
+# {{ php.packages }}
+# {{ php.conf_d }}
+# {{ php.fpm_enabled }}
+# {{ php.timezone }}
+# {{ php.mysql_enabled }}（true のときは {{ mariadb.sock }} も）
+#
+####################################
+
+# 設定は php.ini ではなく conf.d に .ini を置く
+# Apache との連携はパッケージ同梱の conf.d/php.conf が定義済み
+
+- name: "install the php packages"
+  package:
+    name: "{{ php.packages }}"
+    state: present
+
+# php.ini は編集せず追加の .ini を置く
+- name: "put the php settings"
+  template:
+    src: php-package.ini.j2
+    dest: "{{ php.conf_d }}/{{ php.ini_filename }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - "restart php-fpm"
+    - "reload httpd for php"
+
+- name: "show the loaded php configuration files"
+  command: php --ini
+  register: php_ini_files
+  changed_when: false
+
+- name: "debug the loaded php configuration files"
+  debug:
+    var: php_ini_files.stdout_lines
+  when: php_ini_files is succeeded
+
+- name: "enable and start php-fpm"
+  service:
+    name: "{{ php.fpm_service }}"
+    state: started
+    enabled: yes
+  when: php.fpm_enabled
+
+# 連携設定はパッケージが用意するため存在確認のみ行う
+- name: "check that the httpd integration is provided by the package"
+  stat:
+    path: "{{ httpd.conf_d }}/php.conf"
+  register: php_httpd_conf
+  when: php.fpm_enabled and httpd.conf_d is defined
+
+- name: "warn if the httpd integration is missing"
+  debug:
+    msg: >-
+      {{ httpd.conf_d }}/php.conf was not found. Apache will serve .php files as
+      plain text, so the project has to provide the SetHandler directive itself.
+  when:
+    - php.fpm_enabled
+    - httpd.conf_d is defined
+    - php_httpd_conf.stat is defined
+    - not php_httpd_conf.stat.exists
+
+- name: "show version number of PHP"
+  command: php -v
+  register: php_version
+  changed_when: false
+
+- name: "debug version number of PHP"
+  debug:
+    var: php_version.stdout_lines
+  when: php_version is succeeded
+
+- name: "show all loaded modules of PHP"
+  command: php -m
+  register: php_module
+  changed_when: false
+
+- name: "debug all loaded modules of PHP"
+  debug:
+    var: php_module.stdout_lines
+  when: php_module is succeeded

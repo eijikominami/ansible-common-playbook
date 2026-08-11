@@ -1,0 +1,39 @@
+{#
+  /common_playbook/roles/httpd/templates/httpd-package-ssl.conf.j2
+
+  conf.d/ssl.conf を置き換える
+  mod_ssl 同梱の版は自己署名証明書を参照するため、それがない環境では
+  apachectl -t が失敗する
+  グローバル設定のみを残し VirtualHost はプロジェクト側で定義する
+#}
+Listen 443 https
+
+SSLPassPhraseDialog exec:/usr/libexec/httpd-ssl-pass-dialog
+
+SSLSessionCache         shmcb:/run/httpd/sslcache(512000)
+SSLSessionCacheTimeout  300
+
+SSLRandomSeed startup file:/dev/urandom 256
+SSLRandomSeed connect builtin
+
+SSLCryptoDevice builtin
+
+SSLProtocol {{ httpd.ssl_protocol }}
+SSLCipherSuite {{ httpd.ssl_cipher_suite }}
+SSLProxyCipherSuite {{ httpd.ssl_cipher_suite }}
+SSLHonorCipherOrder on
+
+{#
+  _default_:443 は定義しない
+  証明書を持たない VirtualHost があると apachectl -t が失敗する
+
+  プロジェクト側では以下のように定義する
+
+    <VirtualHost *:443>
+        ServerName example.com
+        SSLEngine on
+        SSLCertificateFile    /etc/letsencrypt/live/example.com/fullchain.pem
+        SSLCertificateKeyFile /etc/letsencrypt/live/example.com/privkey.pem
+        DocumentRoot "/var/www/html"
+    </VirtualHost>
+#}

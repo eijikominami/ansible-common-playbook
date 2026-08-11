@@ -6,10 +6,8 @@
 # {{ certbot.domain }}
 # {{ httpd.base_dir }}
 #
-# Python 3.8 未満の環境では certbot のバージョンを固定すること。
-# certbot 2.8.0 で Python 3.7 のサポートが削除されたため、
 # Python 3.7 では certbot.packages に '==2.7.4' を指定し、
-# certbot.pip_state を present にする。
+# certbot.pip_state を present にすること
 #
 ####################################
 

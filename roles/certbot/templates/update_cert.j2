@@ -1,9 +1,5 @@
 #! /bin/bash
-# Managed by Ansible. Do not edit directly.
-#
-# Renews the certificate and distributes it only when the renewal actually
-# happened. The distribution is invoked through certbot's --deploy-hook, which
-# calls this script again with --deploy.
+# 更新が発生したときのみ --deploy-hook 経由で配布する
 set -eu
 
 CERTBOT={% if certbot.venv_path | length > 0 %}{{ certbot.venv_path }}/bin/certbot{% else %}certbot{% endif %}
@@ -13,20 +9,17 @@ HTTPD_CONF_DIR={{ httpd.conf_dir | default(httpd.base_dir ~ '/conf') }}
 HTTPD_CTL={{ httpd.ctlbin | default(httpd.base_dir ~ '/bin/apachectl') }}
 
 install_pair() {
-    # $1: source file name under LIVE_DIR, $2: destination path
+    # $1: LIVE_DIR 配下のファイル名, $2: 配置先
     install -m 0400 -o root -g root "${LIVE_DIR}/$1" "$2"
 }
 
 deploy() {
-    # certbot invokes the deploy hook once per renewed lineage, so skip the
-    # lineages this script is not responsible for.
+    # deploy hook は lineage ごとに呼ばれるため対象外はスキップ
     if [ -n "${RENEWED_LINEAGE:-}" ] && [ "${RENEWED_LINEAGE}" != "${LIVE_DIR}" ]; then
         exit 0
     fi
 
-    # httpd reads the certificate from its own conf directory, so both the
-    # certificate and the private key have to be copied. Copying only the
-    # certificate leaves the key out of sync after a renewal.
+    # 証明書と鍵は対で配布する
     install_pair fullchain.pem "${HTTPD_CONF_DIR}/server.crt"
     install_pair privkey.pem "${HTTPD_CONF_DIR}/server.key"
 {% for target in certbot.deploy_cert_to | default([]) %}
@@ -38,8 +31,7 @@ deploy() {
 {% endif %}
 {% endfor %}
 
-    # graceful keeps the established connections alive while reloading the
-    # renewed certificate.
+    # 確立済みの接続を切らずに再読み込みする
     "${HTTPD_CTL}" graceful
 }
 
