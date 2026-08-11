@@ -28,15 +28,36 @@
 # hash_behaviour = merge
 #   vars_filesが複数あった場合は、後優先で置換（replace）されてしまう
 #   マージポリシーを統合（marge)に変更してそれぞれの値を取得できるようにする
-- name: "add a block to {{ ansible.config }} if it does not exist"
-  blockinfile:
+#
+# blockinfile ではなく ini_file を使う理由:
+#   blockinfile はセクション見出しを含むブロックをそのまま追記するため、対象ファイルに
+#   同名セクションが既にあると重複する。ansible.cfg のデフォルトは [defaults] と
+#   [ssh_connection] を持つので必ず重複し、configparser が DuplicateSectionError を
+#   投げて ansible 自体が起動不能になる。
+#   ini_file は "Adds missing sections if they don't exist" と定義されており、既存
+#   セクションには追記するだけなので重複しない。
+#   なお ini_file は community.general のモジュールで、ansible パッケージ（collections
+#   同梱）には含まれるが ansible-core 単体には含まれない。
+- name: "configure {{ ansible.config }}"
+  ini_file:
     path: "{{ ansible.config }}"
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
     backup: yes
-    block: |
-      [ssh_connection]
-      control_path = %(directory)s/%%h-%%r
-      ssh_args = -o UserKnownHostsFile=/dev/null
-      [defaults]
-      host_key_checking = False
-      log_path={{ ansible.log }}
-      hash_behaviour = merge
+  loop:
+    - section: ssh_connection
+      option: control_path
+      value: '%(directory)s/%%h-%%r'
+    - section: ssh_connection
+      option: ssh_args
+      value: '-o UserKnownHostsFile=/dev/null'
+    - section: defaults
+      option: host_key_checking
+      value: 'False'
+    - section: defaults
+      option: log_path
+      value: "{{ ansible.log }}"
+    - section: defaults
+      option: hash_behaviour
+      value: 'merge'
