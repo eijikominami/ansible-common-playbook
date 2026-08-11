@@ -52,5 +52,8 @@ fi
     --non-interactive \
     --server https://acme-v02.api.letsencrypt.org/directory \
     --agree-tos \
+{% if certbot.cert_name | default('') | length > 0 %}
+    --cert-name {{ certbot.cert_name }} \
+{% endif %}
     --{{ certbot.authenticator }} \
     --deploy-hook "{{ certbot.auto_update_script_path }} --deploy"

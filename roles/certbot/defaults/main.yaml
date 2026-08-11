@@ -19,6 +19,12 @@ certbot:
   venv_command: /usr/bin/python3 -m venv
   # The authenticator plugin passed to 'certbot renew'.
   authenticator: dns-route53
+  # Restrict 'certbot renew' to this lineage with --cert-name. An empty value
+  # renews every lineage on the host, which is the previous behaviour. Set it
+  # when the host carries lineages this role does not manage: 'renew' applies
+  # its options to every certificate it attempts and exits non-zero if any one
+  # of them fails, so an unrelated stale lineage would break the whole run.
+  cert_name: ''
   # Extra destinations for the renewed certificate, for services other than
   # httpd such as postfix or dovecot. Each entry accepts:
   #   cert_src (default fullchain.pem), cert_dest,
