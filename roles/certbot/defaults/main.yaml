@@ -3,5 +3,27 @@
 certbot:
   auto_update_script_path: /usr/local/bin/update_cert.sh
   domain: example.com
+  # Packages installed by pip.
+  # Pin the version here when the target Python is too old to run the latest
+  # certbot. Python 3.7 is capped at 2.7.4 because certbot 2.8.0 dropped it.
+  packages:
+    - certbot
+    - certbot-apache
+    - certbot-dns-route53
+  # Must be 'present' when 'packages' contains a pinned version, because
+  # 'latest' conflicts with an explicit '==' specifier.
+  pip_state: latest
+  # Install into a virtualenv at this path so that the system Python stays
+  # untouched. An empty value keeps the previous behaviour (system pip3).
+  venv_path: ''
+  venv_command: /usr/bin/python3 -m venv
+  # The authenticator plugin passed to 'certbot renew'.
+  authenticator: dns-route53
+  # Extra destinations for the renewed certificate, for services other than
+  # httpd such as postfix or dovecot. Each entry accepts:
+  #   cert_src (default fullchain.pem), cert_dest,
+  #   key_src  (default privkey.pem),   key_dest,
+  #   reload   (optional command executed after the copy)
+  deploy_cert_to: []
 httpd:
   base_dir: /usr/local/apache2

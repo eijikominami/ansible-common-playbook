@@ -6,15 +6,35 @@
 # {{ certbot.domain }}
 # {{ httpd.base_dir }}
 #
+# Python 3.8 未満の環境では certbot のバージョンを固定すること。
+# certbot 2.8.0 で Python 3.7 のサポートが削除されたため、
+# Python 3.7 では certbot.packages に '==2.7.4' を指定し、
+# certbot.pip_state を present にする。
+#
 ####################################
 
-- name: "install the latest version of certbot, certbot-apache, certbot-dns-route53"
-  pip: name={{ packages }}  executable=pip3 state=latest
-  vars:
-    packages:
-      - certbot
-      - certbot-apache
-      - certbot-dns-route53
+- name: "install certbot and its plugins into the virtualenv {{ certbot.venv_path }}"
+  pip:
+    name: "{{ certbot.packages }}"
+    state: "{{ certbot.pip_state }}"
+    virtualenv: "{{ certbot.venv_path }}"
+    virtualenv_command: "{{ certbot.venv_command }}"
+  when: certbot.venv_path | length > 0
+
+- name: "link the certbot in the virtualenv to /usr/local/bin/certbot"
+  file:
+    src: "{{ certbot.venv_path }}/bin/certbot"
+    dest: /usr/local/bin/certbot
+    state: link
+    force: yes
+  when: certbot.venv_path | length > 0
+
+- name: "install certbot and its plugins with the system pip3"
+  pip:
+    name: "{{ certbot.packages }}"
+    state: "{{ certbot.pip_state }}"
+    executable: pip3
+  when: certbot.venv_path | length == 0
 
 - name: "put {{ certbot.auto_update_script_path }}"
   template: src=update_cert.j2 dest="{{ certbot.auto_update_script_path }}" owner=root group=root mode=0744

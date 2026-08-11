@@ -1,5 +1,56 @@
 #! /bin/bash
+# Managed by Ansible. Do not edit directly.
+#
+# Renews the certificate and distributes it only when the renewal actually
+# happened. The distribution is invoked through certbot's --deploy-hook, which
+# calls this script again with --deploy.
+set -eu
 
-certbot renew --no-self-upgrade --server https://acme-v02.api.letsencrypt.org/directory --agree-tos --dns-route53
-cp /etc/letsencrypt/live/{{certbot.domain}}/fullchain.pem {{httpd.base_dir}}/conf/server.crt
-{{httpd.base_dir}}/bin/apachectl restart
+CERTBOT={% if certbot.venv_path | length > 0 %}{{ certbot.venv_path }}/bin/certbot{% else %}certbot{% endif %}
+
+LIVE_DIR=/etc/letsencrypt/live/{{ certbot.domain }}
+HTTPD_CONF_DIR={{ httpd.conf_dir | default(httpd.base_dir ~ '/conf') }}
+HTTPD_CTL={{ httpd.ctlbin | default(httpd.base_dir ~ '/bin/apachectl') }}
+
+install_pair() {
+    # $1: source file name under LIVE_DIR, $2: destination path
+    install -m 0400 -o root -g root "${LIVE_DIR}/$1" "$2"
+}
+
+deploy() {
+    # certbot invokes the deploy hook once per renewed lineage, so skip the
+    # lineages this script is not responsible for.
+    if [ -n "${RENEWED_LINEAGE:-}" ] && [ "${RENEWED_LINEAGE}" != "${LIVE_DIR}" ]; then
+        exit 0
+    fi
+
+    # httpd reads the certificate from its own conf directory, so both the
+    # certificate and the private key have to be copied. Copying only the
+    # certificate leaves the key out of sync after a renewal.
+    install_pair fullchain.pem "${HTTPD_CONF_DIR}/server.crt"
+    install_pair privkey.pem "${HTTPD_CONF_DIR}/server.key"
+{% for target in certbot.deploy_cert_to | default([]) %}
+
+    install_pair {{ target.cert_src | default('fullchain.pem') }} {{ target.cert_dest }}
+    install_pair {{ target.key_src | default('privkey.pem') }} {{ target.key_dest }}
+{% if target.reload is defined %}
+    {{ target.reload }}
+{% endif %}
+{% endfor %}
+
+    # graceful keeps the established connections alive while reloading the
+    # renewed certificate.
+    "${HTTPD_CTL}" graceful
+}
+
+if [ "${1:-}" = "--deploy" ]; then
+    deploy
+    exit 0
+fi
+
+"${CERTBOT}" renew \
+    --non-interactive \
+    --server https://acme-v02.api.letsencrypt.org/directory \
+    --agree-tos \
+    --{{ certbot.authenticator }} \
+    --deploy-hook "{{ certbot.auto_update_script_path }} --deploy"
