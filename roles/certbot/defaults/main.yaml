@@ -23,5 +23,13 @@ certbot:
   # httpd 以外への証明書の配布先
   # cert_src(既定 fullchain.pem), cert_dest, key_src(既定 privkey.pem), key_dest, reload
   deploy_cert_to: []
+  # cron の実体
+  # AL2023 の AMI には cronie が含まれないため role で入れる
+  cron_packages:
+    - cronie
+  cron_service: crond
+  # venv_command が指す Python を提供するパッケージ
+  # 空の場合は OS 同梱の Python を使う
+  python_packages: []
 httpd:
   base_dir: /usr/local/apache2

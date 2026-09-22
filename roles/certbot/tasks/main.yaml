@@ -11,6 +11,36 @@
 #
 ####################################
 
+- name: "install the python that builds the virtualenv"
+  package:
+    name: "{{ certbot.python_packages }}"
+    state: present
+  when: certbot.python_packages | length > 0
+
+# pip モジュールは既存の venv をそのまま使い回すため、Python を差し替えても作り直さない
+# バージョンが変わったときだけ venv を消して再作成させる
+- name: "read the python version behind the existing virtualenv"
+  command: "{{ certbot.venv_path }}/bin/python3 --version"
+  register: certbot_venv_python_version
+  changed_when: false
+  failed_when: false
+  when: certbot.venv_path | length > 0
+
+- name: "read the python version of the requested interpreter"
+  command: "{{ certbot.venv_command.split() | first }} --version"
+  register: certbot_requested_python_version
+  changed_when: false
+  when: certbot.venv_path | length > 0
+
+- name: "remove the virtualenv when it was built with another python"
+  file:
+    path: "{{ certbot.venv_path }}"
+    state: absent
+  when:
+    - certbot.venv_path | length > 0
+    - certbot_venv_python_version.rc | default(1) == 0
+    - certbot_venv_python_version.stdout != certbot_requested_python_version.stdout
+
 - name: "install certbot and its plugins into the virtualenv {{ certbot.venv_path }}"
   pip:
     name: "{{ certbot.packages }}"
@@ -36,6 +66,17 @@
 
 - name: "put {{ certbot.auto_update_script_path }}"
   template: src=update_cert.j2 dest="{{ certbot.auto_update_script_path }}" owner=root group=root mode=0744
+
+- name: "install cron"
+  package:
+    name: "{{ certbot.cron_packages }}"
+    state: present
+
+- name: "enable and start cron"
+  service:
+    name: "{{ certbot.cron_service }}"
+    enabled: yes
+    state: started
 
 - name: "create a job that updates certbot certification"
   cron: name="renew certbot certification" month="*/2" hour="2" minute="0" job="{{ certbot.auto_update_script_path }}"
