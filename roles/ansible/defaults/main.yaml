@@ -12,5 +12,6 @@ ansible:
   # community.general を含む ansible を指定すること
   # ansible-core 単体では ini_file が使えない
   package: ansible
-  # null の場合は enablerepo を渡さない
-  enablerepo: epel
+  # AL2023 は ansible を OS 標準のリポジトリで提供するため epel を登録しない
+  # 空の場合は enablerepo を渡さない
+  enablerepo: "{{ 'epel' if ansible_distribution_major_version is version('2023', '<') else '' }}"
