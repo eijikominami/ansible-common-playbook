@@ -5,6 +5,18 @@ This provides basic components required for Linux server setup.
 
 ## ansible
 - Installs Ansible.
+- The following values need to be configured per project:
+
+| Variable Name | Type | Description | Default Value |
+| ---- | ---- | ---- | ---- |
+| ansible.package | String | Package to install. Specify `ansible` rather than `ansible-core`, because `ini_file` comes from community.general | ansible |
+| ansible.enablerepo | String | Repository to enable while installing. Resolves to `epel` below release 2023 and to an empty string on 2023 and later, because AL2023 provides ansible in its core repository. An empty value passes no `enablerepo` | Conditional on the OS major version |
+| ansible.config | String | Full path to ansible.cfg | /etc/ansible/ansible.cfg |
+| ansible.log | String | Full path to the ansible log | /var/log/ansible.log |
+| ansible.log_mode | String | Permissions of the ansible log | 0640 |
+| ansible.logrotate | String | Full path to the logrotate configuration | /etc/logrotate.d/ansible |
+| ansible.logrotate_frequency | String | Rotation frequency | weekly |
+| ansible.logrotate_rotate | String | Number of generations to keep | 4 |
 
 ## aws-sam-cli
 - Installs AWS SAM CLI.
@@ -12,6 +24,22 @@ This provides basic components required for Linux server setup.
 ## certbot
 - Installs Let's Encrypt commands.
 - Certificate installation requires separate command execution.
+- The following values need to be configured per project:
+
+| Variable Name | Type | Description | Default Value |
+| ---- | ---- | ---- | ---- |
+| **certbot.domain** | String | Domain the certificate is issued for | example.com |
+| certbot.packages | Array | Packages installed with pip. Pin `certbot==2.7.4` on Python 3.7, where later releases do not run | certbot, certbot-apache, certbot-dns-route53 |
+| certbot.pip_state | String | Specify `present` when a version is pinned in packages | latest |
+| certbot.venv_path | String | Path of the virtualenv. An empty value uses the system pip3 | '' |
+| certbot.venv_command | String | Command that creates the virtualenv. The first word is the interpreter, and the role rebuilds the virtualenv when it points at another version | /usr/bin/python3 -m venv |
+| certbot.python_packages | Array | Packages that provide the interpreter in venv_command. An empty value uses the python shipped with the OS | [] |
+| certbot.authenticator | String | Authenticator plugin passed to certbot renew | dns-route53 |
+| certbot.cert_name | String | Lineage passed to --cert-name. An empty value renews every lineage on the host | '' |
+| certbot.auto_update_script_path | String | Full path to the renewal script | /usr/local/bin/update_cert.sh |
+| certbot.deploy_cert_to | Array | Destinations other than httpd. Each entry takes cert_src, cert_dest, key_src, key_dest and reload | [] |
+| certbot.cron_packages | Array | Packages that provide cron. AL2023 ships none in its AMI | cronie |
+| certbot.cron_service | String | Service name of cron | crond |
 
 ## drdb
 - Installs DRDB.
@@ -80,6 +108,16 @@ This provides basic components required for Linux server setup.
 | httpd.max_connections_per_child | String | Limit on the number of requests a child process handles | 0 (unlimited) |
 | httpd.cros | String | URL to allow cross-domain | null |
 | **ssl.dir** | String | SSL installation directory (only when httpd.ssl_enabled=true) | Not specified |
+| httpd.compile_from_src | Bool | Build Apache from source. Set it to false to install the distribution packages instead | true |
+| httpd.packages | Array | Packages installed when compile_from_src=false | httpd, httpd-tools, mod_ssl |
+| httpd.conf_d | String | Directory the role drops additional configuration into (only when compile_from_src=false) | /etc/httpd/conf.d |
+| httpd.service | String | Service name managed through systemd (only when compile_from_src=false) | httpd |
+| httpd.neutralized_conf | Array | Configuration files shipped by the package whose contents are emptied. autoindex.conf exposes /icons/ and welcome.conf exposes /poweredby.png | autoindex.conf, welcome.conf, userdir.conf |
+| httpd.ssl_conf_filename | String | Name of the configuration file mod_ssl installs, whose contents the role replaces | ssl.conf |
+| httpd.ssl_protocol | String | SSLProtocol value (only when compile_from_src=false) | -all +TLSv1.2 +TLSv1.3 |
+| httpd.ssl_cipher_suite | String | SSLCipherSuite value. PROFILE=SYSTEM follows the crypto-policies of the OS | PROFILE=SYSTEM |
+| httpd.min_spare_threads | String | Minimum idle threads for the event and worker MPM | 25 |
+| httpd.max_spare_threads | String | Maximum idle threads for the event and worker MPM | 75 |
 
 ### SSL Certificates
 - When httpd.ssl_enabled is set to true, the following SSL certificate keys must be installed:
@@ -248,6 +286,23 @@ Enter the password found in the following file into the setup screen:
 | httpd.compile_from_src | Bool | Whether Apache was installed from source | true |
 | **httpd.ctlbin** | String | Full path to Apache executable (only when httpd.compile_from_src=true) | Not specified |
 | **mariadb.sock** | String | Full path to MariaDB sock file (only when php.mysql_enabled=true) | Not specified |
+| php.compile_from_src | Bool | Build PHP from source. Set it to false to install the distribution packages instead | true |
+| php.packages | Array | Packages installed when compile_from_src=false. Distributions that carry the version in the name need php8.2-* style values | php, php-fpm, php-opcache, php-mbstring |
+| php.conf_d | String | Directory the role drops an additional .ini into (only when compile_from_src=false) | /etc/php.d |
+| php.ini_filename | String | Name of that .ini. A higher number is read later | 99-ansible.ini |
+| php.fpm_enabled | Bool | Run PHP through php-fpm. The default is true because some distributions no longer ship mod_php for PHP 8.2 | true |
+| php.fpm_service | String | Service name of php-fpm | php-fpm |
+| php.timezone | String | date.timezone | Asia/Tokyo |
+| php.charset | String | default_charset | UTF-8 |
+| php.max_execution_time | String | max_execution_time | 300 |
+| php.upload_max_filesize | String | upload_max_filesize | 2M |
+| php.post_max_size | String | post_max_size | 8M |
+| php.max_file_uploads | String | max_file_uploads | 20 |
+| php.opcache_tuning | Bool | Override the opcache defaults. opcache is already enabled by the package | false |
+| php.opcache_memory_consumption | String | opcache.memory_consumption (only when opcache_tuning=true) | 128 |
+| php.opcache_max_accelerated_files | String | opcache.max_accelerated_files (only when opcache_tuning=true) | 4000 |
+| php.opcache_revalidate_freq | String | opcache.revalidate_freq (only when opcache_tuning=true) | 2 |
+| php.extra_settings | Dict | Any other php.ini setting as key and value | {} |
 
 ### Modules
 - List of enabled modules:

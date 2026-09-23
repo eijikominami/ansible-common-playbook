@@ -5,6 +5,18 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 
 ## ansible
 - Ansibleをインストールします。
+- プロジェクトごとに以下の値の設定が必要です。
+
+| 変数名 | 型 | 内容 | デフォルト値 |
+| ---- | ---- | ---- | ---- |
+| ansible.package | String | インストールするパッケージ。`ini_file` は community.general に含まれるため `ansible-core` ではなく `ansible` を指定する | ansible |
+| ansible.enablerepo | String | インストール時に有効化するリポジトリ。リリース 2023 未満では `epel`、2023 以降では空になる。AL2023 は ansible を OS 標準のリポジトリで提供するため。空の場合は `enablerepo` を渡さない | OS のメジャーバージョンによる条件式 |
+| ansible.config | String | ansible.cfg のフルパス | /etc/ansible/ansible.cfg |
+| ansible.log | String | ansible ログのフルパス | /var/log/ansible.log |
+| ansible.log_mode | String | ansible ログのパーミッション | 0640 |
+| ansible.logrotate | String | logrotate 設定のフルパス | /etc/logrotate.d/ansible |
+| ansible.logrotate_frequency | String | ローテートの頻度 | weekly |
+| ansible.logrotate_rotate | String | 保持する世代数 | 4 |
 
 ## aws-sam-cli
 - AWS SAM CLIをインストールします。
@@ -12,6 +24,22 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 ## certbot
 - Let's Encryptコマンドをインストールします。
 - 証明書のインストールは別途コマンドの実行が必要です。
+- プロジェクトごとに以下の値の設定が必要です。
+
+| 変数名 | 型 | 内容 | デフォルト値 |
+| ---- | ---- | ---- | ---- |
+| **certbot.domain** | String | 証明書を発行するドメイン | example.com |
+| certbot.packages | Array | pip でインストールするパッケージ。Python 3.7 では certbot 2.8.0 以降が動かないため `certbot==2.7.4` を指定する | certbot, certbot-apache, certbot-dns-route53 |
+| certbot.pip_state | String | packages にバージョンを固定した場合は `present` を指定 | latest |
+| certbot.venv_path | String | virtualenv のパス。空の場合はシステムの pip3 を使う | '' |
+| certbot.venv_command | String | virtualenv を作るコマンド。先頭の語が Python の実体で、別のバージョンを指すと role が virtualenv を作り直す | /usr/bin/python3 -m venv |
+| certbot.python_packages | Array | venv_command が指す Python を提供するパッケージ。空の場合は OS 同梱の Python を使う | [] |
+| certbot.authenticator | String | certbot renew に渡す認証プラグイン | dns-route53 |
+| certbot.cert_name | String | --cert-name に渡す lineage。空の場合はホスト上の全 lineage を更新する | '' |
+| certbot.auto_update_script_path | String | 更新スクリプトのフルパス | /usr/local/bin/update_cert.sh |
+| certbot.deploy_cert_to | Array | httpd 以外への配布先。各要素は cert_src、cert_dest、key_src、key_dest、reload を取る | [] |
+| certbot.cron_packages | Array | cron の実体を提供するパッケージ。AL2023 の AMI には含まれない | cronie |
+| certbot.cron_service | String | cron のサービス名 | crond |
 
 ## drdb
 - DRDBをインストールします。
@@ -80,6 +108,16 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | httpd.max_connections_per_child | String | 子プロセスが扱うことのできるリクエスト数の上限 | 0（無限） |
 | httpd.cros | String | クロスドメインを許可するURL | null |
 | **ssl.dir** | String | SSLのインストールディレクト(httpd.ssl_enabled=trueのときのみ) | 指定なし |
+| httpd.compile_from_src | Bool | Apache をソースからビルドするか否か。false にするとディストリビューションのパッケージを使う | true |
+| httpd.packages | Array | compile_from_src=false のときに導入するパッケージ | httpd, httpd-tools, mod_ssl |
+| httpd.conf_d | String | 追加設定を置くディレクトリ (compile_from_src=false のときのみ) | /etc/httpd/conf.d |
+| httpd.service | String | systemd で管理するサービス名 (compile_from_src=false のときのみ) | httpd |
+| httpd.neutralized_conf | Array | 内容を空にするパッケージ同梱の設定。autoindex.conf は /icons/ を、welcome.conf は /poweredby.png を公開する | autoindex.conf, welcome.conf, userdir.conf |
+| httpd.ssl_conf_filename | String | mod_ssl が置く設定ファイル名。role が内容を差し替える | ssl.conf |
+| httpd.ssl_protocol | String | SSLProtocol の値 (compile_from_src=false のときのみ) | -all +TLSv1.2 +TLSv1.3 |
+| httpd.ssl_cipher_suite | String | SSLCipherSuite の値。PROFILE=SYSTEM は OS の crypto-policies に従う | PROFILE=SYSTEM |
+| httpd.min_spare_threads | String | event と worker MPM のアイドルスレッドの最小数 | 25 |
+| httpd.max_spare_threads | String | event と worker MPM のアイドルスレッドの最大数 | 75 |
 
 ### SSL証明書
 
@@ -249,6 +287,23 @@ Linuxサーバ構築時に必要な基本コンポーネントを提供します
 | httpd.compile_from_src | Bool | Apacheをソースコードから入れたか否か | true |  
 | **httpd.ctlbin** | String | Apache実行ファイルのフルパス (httpd.compile_from_src=trueのときのみ) | 指定なし |
 | **mariadb.sock** | String | MariaDB Sockファイルのフルパス (php.mysql_enabled=trueのときのみ) | 指定なし |
+| php.compile_from_src | Bool | PHP をソースからビルドするか否か。false にするとディストリビューションのパッケージを使う | true |
+| php.packages | Array | compile_from_src=false のときに導入するパッケージ。版数を名前に含むディストリビューションでは php8.2-* のように指定する | php, php-fpm, php-opcache, php-mbstring |
+| php.conf_d | String | 追加の .ini を置くディレクトリ (compile_from_src=false のときのみ) | /etc/php.d |
+| php.ini_filename | String | その .ini のファイル名。数字が大きいほど後に読まれる | 99-ansible.ini |
+| php.fpm_enabled | Bool | php-fpm で動かすか否か。PHP 8.2 の mod_php を提供しないディストリビューションがあるため既定で true | true |
+| php.fpm_service | String | php-fpm のサービス名 | php-fpm |
+| php.timezone | String | date.timezone | Asia/Tokyo |
+| php.charset | String | default_charset | UTF-8 |
+| php.max_execution_time | String | max_execution_time | 300 |
+| php.upload_max_filesize | String | upload_max_filesize | 2M |
+| php.post_max_size | String | post_max_size | 8M |
+| php.max_file_uploads | String | max_file_uploads | 20 |
+| php.opcache_tuning | Bool | opcache の既定値を上書きするか否か。opcache はパッケージの既定で有効 | false |
+| php.opcache_memory_consumption | String | opcache.memory_consumption (opcache_tuning=true のときのみ) | 128 |
+| php.opcache_max_accelerated_files | String | opcache.max_accelerated_files (opcache_tuning=true のときのみ) | 4000 |
+| php.opcache_revalidate_freq | String | opcache.revalidate_freq (opcache_tuning=true のときのみ) | 2 |
+| php.extra_settings | Dict | 上記に当てはまらない php.ini の設定をキーと値で指定 | {} |
 
 ### モジュール
 - 有効化しているモジュールの一覧です。
