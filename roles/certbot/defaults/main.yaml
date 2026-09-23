@@ -31,5 +31,12 @@ certbot:
   # venv_command が指す Python を提供するパッケージ
   # 空の場合は OS 同梱の Python を使う
   python_packages: []
+  # 初回取得の対象ドメイン
+  # 空の場合は取得しない（取得済みのホストや手動で管理するホスト）
+  # ワイルドカードは 1 階層しか覆わないため、深い階層は個別に列挙すること
+  domains: []
+  # 取得時の登録メールアドレス
+  # domains を指定する場合は必須
+  email: ''
 httpd:
   base_dir: /usr/local/apache2

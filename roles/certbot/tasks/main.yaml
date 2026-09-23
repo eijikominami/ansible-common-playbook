@@ -64,9 +64,29 @@
     executable: pip3
   when: certbot.venv_path | length == 0
 
+# 取得済みかどうかは lineage のディレクトリで判定する
+# httpd の設定が証明書を参照するため、この role は httpd より前に置くこと
+- name: "check whether the lineage already exists"
+  stat:
+    path: "/etc/letsencrypt/live/{{ certbot.domain }}/fullchain.pem"
+  register: certbot_lineage
+  when: certbot.domains | length > 0
+
+- name: "obtain the certificate for {{ certbot.domains | join(' ') }}"
+  command: >
+    {{ certbot_command }} certonly
+    --{{ certbot.authenticator }}
+    --cert-name {{ certbot.domain }}
+    {{ certbot.domains | map('regex_replace', '^', '-d ') | join(' ') }}
+    --non-interactive --agree-tos -m {{ certbot.email }}
+  when:
+    - certbot.domains | length > 0
+    - not certbot_lineage.stat.exists
+  vars:
+    certbot_command: "{{ (certbot.venv_path + '/bin/certbot') if certbot.venv_path | length > 0 else 'certbot' }}"
+
 - name: "put {{ certbot.auto_update_script_path }}"
   template: src=update_cert.j2 dest="{{ certbot.auto_update_script_path }}" owner=root group=root mode=0744
-
 - name: "install cron"
   package:
     name: "{{ certbot.cron_packages }}"
