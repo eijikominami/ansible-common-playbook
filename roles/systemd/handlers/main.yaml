@@ -1,0 +1,4 @@
+# /common_playbook/roles/systemd/handlers
+
+- name: reload systemd daemon
+  systemd: daemon-reload=yes

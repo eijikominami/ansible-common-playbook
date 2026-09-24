@@ -41,6 +41,24 @@
     var: php_ini_files.stdout_lines
   when: php_ini_files is succeeded
 
+# 既定の max_children は 50 で、メモリの小さいホストでは OOM killer に止められる
+# 値を指定したものだけを書き換える
+- name: "limit the php-fpm pool size"
+  lineinfile:
+    path: "{{ php.fpm_pool_conf }}"
+    regexp: "^{{ item.key }} *="
+    line: "{{ item.key }} = {{ item.value }}"
+    backup: yes
+  loop:
+    - { key: 'pm.max_children', value: "{{ php.fpm_max_children }}" }
+    - { key: 'pm.start_servers', value: "{{ php.fpm_start_servers }}" }
+    - { key: 'pm.min_spare_servers', value: "{{ php.fpm_min_spare_servers }}" }
+    - { key: 'pm.max_spare_servers', value: "{{ php.fpm_max_spare_servers }}" }
+  when:
+    - php.fpm_enabled
+    - item.value | string | length > 0
+  notify: "restart php-fpm"
+
 - name: "enable and start php-fpm"
   service:
     name: "{{ php.fpm_service }}"
