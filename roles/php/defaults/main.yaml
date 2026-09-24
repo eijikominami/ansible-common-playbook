@@ -35,6 +35,16 @@ php:
   fpm_enabled: true
   fpm_service: php-fpm
 
+  # php-fpm のプロセス数
+  # パッケージ既定の max_children は 50 で、1 プロセスあたり 17MB 程度を使う
+  # メモリの小さいホストでは上限に達する前に OOM killer に止められる
+  # 空の場合はパッケージ既定のままにする
+  fpm_pool_conf: /etc/php-fpm.d/www.conf
+  fpm_max_children: ''
+  fpm_start_servers: ''
+  fpm_min_spare_servers: ''
+  fpm_max_spare_servers: ''
+
   # php.ini の既定を上書きする値
   timezone: Asia/Tokyo
   charset: UTF-8

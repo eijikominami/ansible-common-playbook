@@ -1,0 +1,66 @@
+# /common_playbook/roles/systemd/tasks
+
+# ATTENTION ########################
+# 以下の値は、各プロジェクトごとに指定すること
+#
+# {{ systemd.units }}
+#
+####################################
+
+# パッケージが更新してもユーザーの指定が残るよう drop-in に書く
+- name: "create the drop-in directories"
+  file:
+    path: "/etc/systemd/system/{{ item.name }}.service.d"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop: "{{ systemd.units }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: "put the drop-in configurations"
+  template:
+    src: drop-in.conf.j2
+    dest: "/etc/systemd/system/{{ item.name }}.service.d/{{ systemd.drop_in_filename }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ systemd.units }}"
+  loop_control:
+    label: "{{ item.name }}"
+  vars:
+    unit: "{{ item }}"
+  notify: "reload systemd daemon"
+
+# 以降の確認タスクが新しい設定を読むため handler を先に流す
+- name: "apply the drop-in configurations before checking them"
+  meta: flush_handlers
+
+# drop-in が読まれていなければ再起動は働かない
+# 待ち時間のプロパティ名は RestartSec ではなく RestartUSec
+- name: "read back the applied settings"
+  command: "systemctl show {{ item.name }} --property=Restart --property=RestartUSec --property=OOMPolicy --property=StartLimitBurst"
+  loop: "{{ systemd.units }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: systemd_applied
+  changed_when: false
+
+- name: "debug the applied settings"
+  debug:
+    msg: "{{ item.item.name }}: {{ item.stdout_lines }}"
+  loop: "{{ systemd_applied.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: systemd_applied is succeeded
+
+- name: "fail if a requested restart policy is not in effect"
+  fail:
+    msg: "Restart={{ item.item.restart }} is not in effect for {{ item.item.name }}. Check the drop-in."
+  loop: "{{ systemd_applied.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when:
+    - item.item.restart is defined
+    - "'Restart=' + item.item.restart not in item.stdout"

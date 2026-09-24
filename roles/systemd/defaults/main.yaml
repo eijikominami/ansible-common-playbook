@@ -1,0 +1,16 @@
+# /common_playbook/roles/systemd/defaults
+
+systemd:
+  # ユニットごとに drop-in を置く。パッケージ同梱のユニットファイルは触らない
+  # 各要素で name のみ必須。指定した項目だけを drop-in に書く
+  #
+  #   units:
+  #     - name: httpd
+  #       restart: on-failure
+  #       restart_sec: 10
+  #       start_limit_interval_sec: 300
+  #       start_limit_burst: 5
+  #       oom_policy: continue
+  #
+  units: []
+  drop_in_filename: 99-override.conf

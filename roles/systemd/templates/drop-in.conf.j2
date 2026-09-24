@@ -1,0 +1,21 @@
+{# StartLimit* は [Unit]、Restart 系と OOMPolicy は [Service] に置く #}
+{% if unit.start_limit_interval_sec is defined or unit.start_limit_burst is defined %}
+[Unit]
+{% if unit.start_limit_interval_sec is defined %}
+StartLimitIntervalSec={{ unit.start_limit_interval_sec }}
+{% endif %}
+{% if unit.start_limit_burst is defined %}
+StartLimitBurst={{ unit.start_limit_burst }}
+{% endif %}
+
+{% endif %}
+[Service]
+{% if unit.restart is defined %}
+Restart={{ unit.restart }}
+{% endif %}
+{% if unit.restart_sec is defined %}
+RestartSec={{ unit.restart_sec }}
+{% endif %}
+{% if unit.oom_policy is defined %}
+OOMPolicy={{ unit.oom_policy }}
+{% endif %}
